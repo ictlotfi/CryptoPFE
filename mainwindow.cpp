@@ -2,6 +2,7 @@
 #include "ui_mainwindow.h"
 #include <QDebug>
 #include "millerrabin.h"
+#include <QMessageBox>
 
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -9,8 +10,11 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    this->showMaximized();
 
      model = new QStringListModel(this);
+
+     generate_equation();
 }
 
 MainWindow::~MainWindow()
@@ -59,6 +63,10 @@ void MainWindow::on_button_generate_ec_points_clicked()
     // verify if p is a prime number
     MillerRabin *m = new MillerRabin();
     if(!m->isPrime(p)){
+        QMessageBox msgBox;
+        msgBox.setText("P is not prime");
+        msgBox.exec();
+
         qDebug() << p << " is NOT prime";
         return;
     }
@@ -96,16 +104,24 @@ void MainWindow::on_button_select_base_clicked()
     ui->lineEdit_base_x->setText(x);
     ui->lineEdit_base_y->setText(y);
 
-    ui->lineEdit_private_key->setFocus();
+    ui->lineEdit_private_key_alice->setFocus();
 }
 
-void MainWindow::on_button_generate_public_key_clicked()
+void MainWindow::on_button_generate_public_key_alice_clicked()
 {
     if(ui->listView_ec_points->currentIndex().row() < 0) return;
     int p = ui->lineEdit_p->text().toInt();
     int a = ui->lineEdit_a->text().toInt();
     int b = ui->lineEdit_b->text().toInt();
-    int private_key = ui->lineEdit_private_key->text().toInt();
+    int private_key = ui->lineEdit_private_key_alice->text().toInt();
+
+    if (private_key>= p || private_key < 1){
+        QMessageBox msgBox;
+        msgBox.setText("The private key is not between 1 and p-1");
+        msgBox.exec();
+
+        return;
+    }
     QString x, y;
     QStringList telmpList = ui->listView_ec_points->currentIndex().data().toString().split(",");
     x = telmpList.at(0);
@@ -121,7 +137,7 @@ void MainWindow::on_button_generate_public_key_clicked()
     ecc_main->generatePublicKey();
 
     //qDebug() << ecc->getPublicKey()->x();
-    ui->lineEdit_public_key->setText(QString::number(ecc_main->getPublicKey()->x()) + ", " +
+    ui->lineEdit_public_key_alice->setText(QString::number(ecc_main->getPublicKey()->x()) + ", " +
                                                      QString::number(ecc_main->getPublicKey()->y()));
 
 }
@@ -176,4 +192,38 @@ int premier (long n) {
     if (n % d == 0)
       return 0;
   return 1;
+}
+
+void MainWindow::on_button_generate_public_key_bob_clicked()
+{
+    if(ui->listView_ec_points->currentIndex().row() < 0) return;
+    int p = ui->lineEdit_p->text().toInt();
+    int a = ui->lineEdit_a->text().toInt();
+    int b = ui->lineEdit_b->text().toInt();
+    int private_key = ui->lineEdit_private_key_bob->text().toInt();
+
+    if (private_key>= p || private_key < 1){
+        QMessageBox msgBox;
+        msgBox.setText("The private key is not between 1 and p-1");
+        msgBox.exec();
+
+        return;
+    }
+    QString x, y;
+    QStringList telmpList = ui->listView_ec_points->currentIndex().data().toString().split(",");
+    x = telmpList.at(0);
+    y = telmpList.at(1);
+
+    QPoint *base_point = new QPoint(x.toInt(), y.toInt());
+    ecc_main = new ECC();
+    ecc_main->setA(a);
+    ecc_main->setB(b);
+    ecc_main->setP(p);
+    ecc_main->setBasePoint(base_point);
+    ecc_main->setPrivateKey(private_key);
+    ecc_main->generatePublicKey();
+
+    //qDebug() << ecc->getPublicKey()->x();
+    ui->lineEdit_public_key_bob->setText(QString::number(ecc_main->getPublicKey()->x()) + ", " +
+                                                     QString::number(ecc_main->getPublicKey()->y()));
 }

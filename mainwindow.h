@@ -38,11 +38,13 @@ private slots:
 
     void on_button_select_base_clicked();
 
-    void on_button_generate_public_key_clicked();
+    void on_button_generate_public_key_alice_clicked();
 
     void on_button_select_message_clicked();
 
     void on_button_generate_cipher_clicked();
+
+    void on_button_generate_public_key_bob_clicked();
 
 private:
     Ui::MainWindow *ui;
