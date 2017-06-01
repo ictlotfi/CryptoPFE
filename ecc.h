@@ -31,13 +31,21 @@ public:
     int EGCD(int a, int b, int& u, int &v);
     int NegMod(int a, int p);
 
+    int add_x(int x1, int y1, int x2, int y2);
+    int add_y(int x1, int y1, int x2, int y2, int x3);
+    int mult_x (int x, int y, int k);
+    int mult_y (int x, int y, int k);
+    QPoint *addPoints(QPoint *p1, QPoint *p2);
+    QPoint *multPoint(QPoint *p, int k);
+    QPoint *generatePoint(int m);
 private:
     int a;
     int b;
     int p;
     int private_key;
+    int koblitz;
     QPoint *base_point;
-    QPoint *public_key;
+    QPoint *result_point;
 };
 
 #endif // ECC_H

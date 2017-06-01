@@ -3,7 +3,8 @@
 ECC::ECC()
 {
     base_point = new QPoint();
-    public_key = new QPoint();
+    result_point = new QPoint();
+    koblitz = 30;
 }
 
 void ECC::setA(int a)
@@ -33,7 +34,7 @@ void ECC::setBasePoint(QPoint *p)
 
 void ECC::setPublicKey(QPoint *p)
 {
-    this->public_key = p;
+    this->result_point = p;
 }
 
 int ECC::getA()
@@ -63,11 +64,20 @@ QPoint *ECC::getBasePoint()
 
 QPoint *ECC::getPublicKey()
 {
-    return this->public_key;
+    return this->result_point;
 }
 
 void ECC::generatePublicKey()
 {
+    QPoint *p = generatePoint(1);
+    /*int x3 = mult_x(base_point->x(), base_point->y(), private_key);
+    int y3 = mult_y(base_point->x(), base_point->y(), private_key);
+    qDebug() << "base_point->x() " << base_point->x();
+    qDebug() << "base_point->y() " << base_point->y();*/
+    qDebug() << "x " << p->x();
+    qDebug() << "y " << p->y();
+
+
     if (private_key == 2) {
         addDouble();
     }
@@ -81,6 +91,7 @@ void ECC::generatePublicKey()
 
 void ECC::addDouble() // int xp, int yp, int &xr, int &yr, int a, int p
 {
+
     int s;
     int temp_x_public, temp_y_public;
     int n = 3 * base_point->x() * base_point->x() + a ;
@@ -107,8 +118,8 @@ void ECC::addDouble() // int xp, int yp, int &xr, int &yr, int a, int p
     else
     temp_y_public = yr_ % p;
 
-    public_key->setX(temp_x_public);
-    public_key->setY(temp_y_public);
+    result_point->setX(temp_x_public);
+    result_point->setY(temp_y_public);
 
     /*qDebug() << "base_point->x() " << base_point->x();
     qDebug() << "base_point->y() " << base_point->y();
@@ -169,12 +180,133 @@ int n = ceil((float)b / p);
 return (n * p) - b;
 }
 
+int ECC::add_x(int x1, int y1, int x2, int y2)
+{
+    if ( x1>x2 )
+    {
+    int temp=x2 ;
+    x2=x1 ; x1=temp ;
+    temp=y2 ;
+    y2=y1 ; y1=temp ;
+    }
+    int x3 , m;
+    if ( x1 == 0 ) { x3=x2 ; }
+    else if ( x2 ==0) { x3=x1 ; }
+    else if ( x1 != x2 )
+    {
+    m = NegMod ((NegMod((y2-y1), p ) * InvMod ( NegMod ( x2-x1 , p ) , p ) ) , p );
+    x3 = NegMod ( ( (m*m) -x1 -x2 ) , p ) ;
+    }
+    else if ( ( x1==x2 ) && ( y1 != y2 ) ) { x3 =0;}
+    else if ( x1==x2 && ( y1==y2 ) && y1 !=0)
+    {
+    m = NegMod ( ( ( 3 * ( x1 * x1 )+a ) * InvMod ( ( 2 * y1 ) , p ) ) , p );
+    x3 = NegMod ( ( (m*m) - x1 - x2 ) , p ) ;
+    }
+    else if ( x1==x2 && y1==y2 && y1==0) { x3 =0;}
+    return NegMod ( x3 , p ) ;
+}
+
+int ECC::add_y(int x1, int y1, int x2, int y2, int x3)
+{
+    if ( x1>x2 )
+    {
+    int temp=x2 ;
+    x2=x1 ; x1=temp ;
+    temp=y2 ;
+    y2=y1 ; y1=temp ;
+    }
+    int m, y3 ;
+    if ( x1 == 0 ) { y3=y2 ; }
+    else if ( x2 ==0) { y3=y1 ; }
+    else if ( x1 != x2 )
+    {
+        m = NegMod ( ( NegMod ( ( y2-y1 ) , p ) * InvMod ( NegMod ( x2-x1 , p ) , p ) ) , p );
+        y3 = NegMod ( ( (m * NegMod ( ( x1-x3 ) , p ) ) -y1 ) , p ) ;
+    }
+
+    else  if ( ( x1==x2 ) && ( y1 != y2 ) ) { y3 =0;}
+    else if ( x1==x2 && ( y1==y2 ) && y1 !=0)
+    {
+    m = NegMod ( ( ( 3 * ( x1 * x1 )+a ) * InvMod ( ( 2 * y1 ) , p ) ) , p ) ;
+    y3 = NegMod ( ( (m * NegMod ( ( x1-x3 ) , p ) ) -y1 ) , p ) ;
+    }
+    else if ( x1==x2 && y1==y2 && y1==0) { y3 =0;}
+    return NegMod ( y3 , p ) ;
+}
+
+int ECC::mult_x(int x, int y, int k)
+{
+    int Rx , Ry ;
+    Rx=x ;
+    Ry=y ;
+    int temp , compteur ;
+    for ( compteur =1; compteur < k ; compteur++)
+    {
+    temp=Rx ;
+    Rx=add_x ( x , y , Rx , Ry) ;
+    Ry=add_y ( x , y , temp , Ry , Rx) ;
+    }
+    return Rx ;
+}
+
+int ECC::mult_y(int x, int y, int k)
+{
+    int Rx , Ry ;
+    Rx=x ;
+    Ry=y ;
+    int temp , compteur ;
+    for ( compteur =1; compteur < k ; compteur++)
+    {
+    temp=Rx ;
+    Rx=add_x ( x , y , Rx , Ry) ;
+    Ry=add_y ( x , y , temp , Ry , Rx) ;
+    }
+    return Ry ;
+}
+
+QPoint *ECC::addPoints(QPoint *p1, QPoint *p2)
+{
+    int x3 = add_x(p1->x(), p1->y(), p2->x(), p2->y());
+    int y3 = add_y(p1->x(), p1->y(), p2->x(), p2->y(), x3);
+
+     return new QPoint(x3, y3);
+}
+
+QPoint *ECC::multPoint(QPoint *p, int k)
+{
+    int x3 = mult_x(p->x(), p->y(), private_key);
+    int y3 = mult_y(p->x(), p->y(), private_key);
+
+    return new QPoint(x3, y3);
+}
+
+QPoint *ECC::generatePoint(int m)
+{
+    for (int i=1; i < koblitz; i++){
+        long x = m * koblitz + i;
+        long yy = x*x*x +a*x +b;
+
+        for (int y = 0; y < p; y++) {
+            int k = y * y;
+            if (k % p == yy % p) {
+                // point exists
+                qDebug() << "1 " << k % p;
+                qDebug() << "2 " << yy % p;
+
+                return new QPoint(x, y);
+            }
+        }
+    }
+    return new QPoint(0, 0);
+}
+
 void ECC::addPoints () //int xp, int yp, int xq, int yq, int &xr, int &yr, int p
 {
     int s;
     int temp_x_public, temp_y_public;
-    int n = base_point->y() - public_key->y();
-    int d = base_point->x() - public_key->x();
+    int n = base_point->y() - result_point->y();
+    int d = base_point->x() - result_point->x();
 
     if (d < 0) {
             n *= -1; d *= -1;
@@ -186,7 +318,7 @@ void ECC::addPoints () //int xp, int yp, int xq, int yq, int &xr, int &yr, int p
     else {
     s = NegMod(n * x, p);
     }
-    int xr_ = (s * s - base_point->x() - public_key->x());
+    int xr_ = (s * s - base_point->x() - result_point->x());
     if (xr_ < 0)
     temp_x_public = NegMod (xr_, p);
     else
@@ -197,6 +329,6 @@ void ECC::addPoints () //int xp, int yp, int xq, int yq, int &xr, int &yr, int p
     else
     temp_y_public = yr_ % p;
 
-    public_key->setX(temp_x_public);
-    public_key->setY(temp_y_public);
+    result_point->setX(temp_x_public);
+    result_point->setY(temp_y_public);
 }

@@ -83,7 +83,7 @@
      <item>
       <widget class="QLineEdit" name="lineEdit_p">
        <property name="text">
-        <string>19</string>
+        <string>1063</string>
        </property>
       </widget>
      </item>
@@ -109,7 +109,7 @@
      <item>
       <widget class="QLineEdit" name="lineEdit_a">
        <property name="text">
-        <string>-1</string>
+        <string>-3</string>
        </property>
       </widget>
      </item>
@@ -161,7 +161,11 @@
         </widget>
        </item>
        <item>
-        <widget class="QLineEdit" name="lineEdit_base_x"/>
+        <widget class="QLineEdit" name="lineEdit_base_x">
+         <property name="text">
+          <string>17</string>
+         </property>
+        </widget>
        </item>
       </layout>
      </item>
@@ -175,7 +179,11 @@
         </widget>
        </item>
        <item>
-        <widget class="QLineEdit" name="lineEdit_base_y"/>
+        <widget class="QLineEdit" name="lineEdit_base_y">
+         <property name="text">
+          <string>26</string>
+         </property>
+        </widget>
        </item>
       </layout>
      </item>
@@ -291,7 +299,11 @@
        </widget>
       </item>
       <item>
-       <widget class="QLineEdit" name="lineEdit_private_key_bob"/>
+       <widget class="QLineEdit" name="lineEdit_private_key_bob">
+        <property name="text">
+         <string>6</string>
+        </property>
+       </widget>
       </item>
      </layout>
     </widget>
@@ -326,7 +338,11 @@
        </widget>
       </item>
       <item>
-       <widget class="QLineEdit" name="lineEdit_private_key_alice"/>
+       <widget class="QLineEdit" name="lineEdit_private_key_alice">
+        <property name="text">
+         <string>5</string>
+        </property>
+       </widget>
       </item>
      </layout>
     </widget>
@@ -343,7 +359,7 @@
       <string>Générer la clé public</string>
      </property>
     </widget>
-    <widget class="QWidget" name="">
+    <widget class="QWidget" name="layoutWidget">
      <property name="geometry">
       <rect>
        <x>10</x>

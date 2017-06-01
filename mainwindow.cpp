@@ -15,6 +15,7 @@ MainWindow::MainWindow(QWidget *parent) :
      model = new QStringListModel(this);
 
      generate_equation();
+     on_button_generate_ec_points_clicked();
 }
 
 MainWindow::~MainWindow()
@@ -71,6 +72,8 @@ void MainWindow::on_button_generate_ec_points_clicked()
         return;
     }
 
+    // verify is 4A^3+27b^2 <> 0
+
 
     QStringList list;
 
@@ -109,7 +112,7 @@ void MainWindow::on_button_select_base_clicked()
 
 void MainWindow::on_button_generate_public_key_alice_clicked()
 {
-    if(ui->listView_ec_points->currentIndex().row() < 0) return;
+    //if(ui->listView_ec_points->currentIndex().row() < 0) return;
     int p = ui->lineEdit_p->text().toInt();
     int a = ui->lineEdit_a->text().toInt();
     int b = ui->lineEdit_b->text().toInt();
@@ -124,8 +127,10 @@ void MainWindow::on_button_generate_public_key_alice_clicked()
     }
     QString x, y;
     QStringList telmpList = ui->listView_ec_points->currentIndex().data().toString().split(",");
-    x = telmpList.at(0);
-    y = telmpList.at(1);
+    //x = telmpList.at(0);
+    //y = telmpList.at(1);
+    x = ui->lineEdit_base_x->text();
+    y = ui->lineEdit_base_y->text();
 
     QPoint *base_point = new QPoint(x.toInt(), y.toInt());
     ecc_main = new ECC();
