@@ -1,4 +1,6 @@
 #include "ecc.h"
+#include "alphabet.h"
+
 
 ECC::ECC()
 {
@@ -67,35 +69,43 @@ QPoint *ECC::getPublicKey()
     return this->result_point;
 }
 
-void ECC::generatePublicKey()
+QPoint *ECC::encryptPoint(QPoint *p_new, int k)
 {
-    QPoint *p = generatePoint(1);
+    //QPoint *p = generatePoint(1);
     /*int x3 = mult_x(base_point->x(), base_point->y(), private_key);
     int y3 = mult_y(base_point->x(), base_point->y(), private_key);
     qDebug() << "base_point->x() " << base_point->x();
     qDebug() << "base_point->y() " << base_point->y();*/
-    qDebug() << "x " << p->x();
-    qDebug() << "y " << p->y();
+    //qDebug() << "x " << p->x();
+    //qDebug() << "y " << p->y();
 
+    QPoint *p ;
 
-    if (private_key == 2) {
-        addDouble();
+    if (k == 2) {
+        p = addDouble(p_new);
     }
-    else if (private_key > 2) {
-        addDouble();
-        for (int i = 0; i < private_key - 2; i++) {
-            addPoints();
+    else if (k > 2) {
+        p = addDouble(p_new);
+        for (int i = 0; i < k - 2; i++) {
+            p = addPoints(p_new, p);
         }
     }
+
+    return p;
 }
 
-void ECC::addDouble() // int xp, int yp, int &xr, int &yr, int a, int p
+QPoint *ECC::decryptPoint(QPoint *p)
+{
+
+}
+
+QPoint *ECC::addDouble(QPoint *point) // int xp, int yp, int &xr, int &yr, int a, int p
 {
 
     int s;
     int temp_x_public, temp_y_public;
-    int n = 3 * base_point->x() * base_point->x() + a ;
-    int d = 2 * base_point->y();
+    int n = 3 * point->x() * point->x() + a ;
+    int d = 2 * point->y();
     if (d < 0) {
         n *= -1;
         d *= -1;
@@ -107,28 +117,18 @@ void ECC::addDouble() // int xp, int yp, int &xr, int &yr, int a, int p
     else {
         s = NegMod(n * x, p);
     }
-    int xr_ = (s * s - 2 * base_point->x());
+    int xr_ = (s * s - 2 * point->x());
     if (xr_ < 0)
     temp_x_public = NegMod (xr_, p);
     else
     temp_x_public = xr_ % p;
-    int yr_ = (-base_point->y() + s * (base_point->x() - temp_x_public));
+    int yr_ = (-point->y() + s * (point->x() - temp_x_public));
     if (yr_ < 0)
     temp_y_public = NegMod(yr_, p);
     else
     temp_y_public = yr_ % p;
 
-    result_point->setX(temp_x_public);
-    result_point->setY(temp_y_public);
-
-    /*qDebug() << "base_point->x() " << base_point->x();
-    qDebug() << "base_point->y() " << base_point->y();
-    qDebug() << "a " << a;
-    qDebug() << "b " << b;
-    qDebug() << "p " << p;
-    qDebug() << "private_key " << private_key;
-    qDebug() << "x " << temp_x_public;
-    qDebug() << "y " << temp_y_public;*/
+    return new QPoint(temp_x_public, temp_y_public);
 }
 
 int ECC::InvMod(int x, int n) // Solve linear congruence equation x * z == 1 (mod n)for z
@@ -265,13 +265,13 @@ int ECC::mult_y(int x, int y, int k)
     return Ry ;
 }
 
-QPoint *ECC::addPoints(QPoint *p1, QPoint *p2)
+/*QPoint *ECC::addPoints(QPoint *p1, QPoint *p2)
 {
     int x3 = add_x(p1->x(), p1->y(), p2->x(), p2->y());
     int y3 = add_y(p1->x(), p1->y(), p2->x(), p2->y(), x3);
 
      return new QPoint(x3, y3);
-}
+}*/
 
 QPoint *ECC::multPoint(QPoint *p, int k)
 {
@@ -291,8 +291,8 @@ QPoint *ECC::generatePoint(int m)
             int k = y * y;
             if (k % p == yy % p) {
                 // point exists
-                qDebug() << "1 " << k % p;
-                qDebug() << "2 " << yy % p;
+                //qDebug() << "1 " << k % p;
+               // qDebug() << "2 " << yy % p;
 
                 return new QPoint(x, y);
             }
@@ -301,12 +301,74 @@ QPoint *ECC::generatePoint(int m)
     return new QPoint(0, 0);
 }
 
-void ECC::addPoints () //int xp, int yp, int xq, int yq, int &xr, int &yr, int p
+QList<QPoint*> *ECC::textToPoints(QString text)
+{
+    QList<QPoint*> *list = new QList<QPoint*>();
+
+    for (int i = 0; i < text.size(); i++){
+        QChar ch = text[i];
+        int m = charToCode(ch);
+        QPoint *point = generatePoint(m);
+        list->append(point);
+    }
+    return list;
+}
+
+int ECC::charToCode(QChar ch)
+{
+    if (ch == '0') return 0;
+    else if (ch == '1') return 1;
+    else if (ch == '2') return 2;
+    else if (ch == '3') return 3;
+    else if (ch == '4') return 4;
+    else if (ch == '5') return 5;
+    else if (ch == '6') return 6;
+    else if (ch == '7') return 7;
+    else if (ch == '8') return 8;
+    else if (ch == '9') return 9;
+    else if (ch == 'a') return 10;
+    else if (ch == 'b') return 11;
+    else if (ch == 'c') return 12;
+    else if (ch == 'd') return 13;
+    else if (ch == 'e') return 14;
+    else if (ch == 'f') return 15;
+    else if (ch == 'g') return 16;
+    else if (ch == 'h') return 17;
+    else if (ch == 'i') return 18;
+    else if (ch == 'j') return 19;
+    else if (ch == 'k') return 20;
+    else if (ch == 'l') return 21;
+    else if (ch == 'm') return 22;
+    else if (ch == 'n') return 23;
+    else if (ch == 'o') return 24;
+    else if (ch == 'p') return 25;
+    else if (ch == 'q') return 26;
+    else if (ch == 'r') return 27;
+    else if (ch == 's') return 28;
+    else if (ch == 't') return 29;
+    else if (ch == 'u') return 30;
+    else if (ch == 'v') return 31;
+    else if (ch == 'w') return 32;
+    else if (ch == 'x') return 33;
+    else if (ch == 'y') return 34;
+    else if (ch == 'z') return 35;
+}
+
+CM *ECC::generateCm(int k, QPoint *point, QPoint *peer_public_key)
+{
+    QPoint *p1 = encryptPoint(base_point, k);
+    QPoint *p2 = encryptPoint(peer_public_key, k);
+    p2 = addPoints(point, p2);
+
+    return new CM(p1, p2);
+}
+
+QPoint *ECC::addPoints (QPoint *point1, QPoint *point2) //int xp, int yp, int xq, int yq, int &xr, int &yr, int p
 {
     int s;
     int temp_x_public, temp_y_public;
-    int n = base_point->y() - result_point->y();
-    int d = base_point->x() - result_point->x();
+    int n = point1->y() - point2->y();
+    int d = point1->x() - point2->x();
 
     if (d < 0) {
             n *= -1; d *= -1;
@@ -318,17 +380,16 @@ void ECC::addPoints () //int xp, int yp, int xq, int yq, int &xr, int &yr, int p
     else {
     s = NegMod(n * x, p);
     }
-    int xr_ = (s * s - base_point->x() - result_point->x());
+    int xr_ = (s * s - point1->x() - point2->x());
     if (xr_ < 0)
     temp_x_public = NegMod (xr_, p);
     else
     temp_x_public = xr_ % p;
-    int yr_ = (-base_point->y() + s * (base_point->x() - temp_x_public));
+    int yr_ = (-point1->y() + s * (point1->x() - temp_x_public));
     if (yr_ < 0)
     temp_y_public = NegMod(yr_, p);
     else
     temp_y_public = yr_ % p;
 
-    result_point->setX(temp_x_public);
-    result_point->setY(temp_y_public);
+    return new QPoint(temp_x_public, temp_y_public);
 }

@@ -207,7 +207,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QLineEdit" name="lineEdit_message"/>
+      <widget class="QLineEdit" name="lineEdit_messagesgvs"/>
      </item>
     </layout>
    </widget>
@@ -378,6 +378,85 @@
       </item>
       <item>
        <widget class="QLineEdit" name="lineEdit_public_key_alice"/>
+      </item>
+     </layout>
+    </widget>
+    <widget class="QPushButton" name="button_encode_message">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>180</y>
+       <width>201</width>
+       <height>25</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Coder le message</string>
+     </property>
+    </widget>
+    <widget class="QTextEdit" name="textEdit_encoded_message">
+     <property name="geometry">
+      <rect>
+       <x>30</x>
+       <y>220</y>
+       <width>121</width>
+       <height>131</height>
+      </rect>
+     </property>
+    </widget>
+    <widget class="QTextEdit" name="textEdit_encrypted_message">
+     <property name="geometry">
+      <rect>
+       <x>190</x>
+       <y>220</y>
+       <width>101</width>
+       <height>131</height>
+      </rect>
+     </property>
+    </widget>
+    <widget class="QTextEdit" name="textEdit_cm_message">
+     <property name="geometry">
+      <rect>
+       <x>310</x>
+       <y>220</y>
+       <width>211</width>
+       <height>131</height>
+      </rect>
+     </property>
+    </widget>
+    <widget class="QTextEdit" name="textEdit_decrypted_message">
+     <property name="geometry">
+      <rect>
+       <x>340</x>
+       <y>40</y>
+       <width>121</width>
+       <height>131</height>
+      </rect>
+     </property>
+    </widget>
+    <widget class="QWidget" name="">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>140</y>
+       <width>241</width>
+       <height>27</height>
+      </rect>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout_11">
+      <item>
+       <widget class="QLabel" name="label_11">
+        <property name="text">
+         <string>Message :</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLineEdit" name="lineEdit_message">
+        <property name="text">
+         <string>a</string>
+        </property>
+       </widget>
       </item>
      </layout>
     </widget>

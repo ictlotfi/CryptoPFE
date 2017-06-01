@@ -27,12 +27,14 @@ SOURCES += main.cpp\
         mainwindow.cpp \
     ecc.cpp \
     rsa.cpp \
-    millerrabin.cpp
+    millerrabin.cpp \
+    cm.cpp
 
 HEADERS  += mainwindow.h \
     ecc.h \
     rsa.h \
     millerrabin.h \
-    alphabet.h
+    alphabet.h \
+    cm.h
 
 FORMS    += mainwindow.ui

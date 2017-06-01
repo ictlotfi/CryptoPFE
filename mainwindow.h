@@ -6,6 +6,8 @@
 #include <QPoint>
 #include <QDebug>
 #include "ecc.h"
+#include "cm.h"
+
 
 namespace Ui {
 class MainWindow;
@@ -26,6 +28,7 @@ public:
     void scalar_multiplicaiton (int xp, int yp, int k, int a, int p, int &PUx, int &PUy);
     static int EGCD(int a, int b, int& u, int &v);
     QPoint *encrypt(QPoint *p);
+    void generatePublicKeys();
 
 private slots:
     void on_lineEdit_p_textChanged(const QString &);
@@ -46,10 +49,14 @@ private slots:
 
     void on_button_generate_public_key_bob_clicked();
 
+    void on_button_encode_message_clicked();
+
 private:
     Ui::MainWindow *ui;
     QStringListModel *model;
     ECC *ecc_main;
+    int k_a, k_b, private_key_a, private_key_b;
+    QPoint *peer_public_key_a, *peer_public_key_b;
 };
 
 #endif // MAINWINDOW_H
