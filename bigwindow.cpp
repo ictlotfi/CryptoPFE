@@ -10,6 +10,9 @@ BigWindow::BigWindow(QWidget *parent) :
     QTime time = QTime::currentTime();
     qsrand((uint)time.msec());
     ecc_big = new ECC_BIG();
+    ecc_big->setA(ui->lineEdit_a->text().toInt());
+    ecc_big->setB(stringToMPI("18958286285566608000408668544493926415504680968679321075787234672564"));
+    ecc_big->setP(stringToMPI("26959946667150639794667015087019630673557916260026308143510066298881"));
 
     private_key_a = "20723429452102997097693055120908112174847588083791179561894667245437";
     private_key_b = "26783546327533480407843357618229179705380334259814175764895254907511";
@@ -36,8 +39,8 @@ BigWindow::BigWindow(QWidget *parent) :
 
     //ecc_big->setBasePoint(myPoint);
     myPoint = ecc_big->addDouble(myPoint);
-    //qDebug() << mpiToString(myPoint->X());
-    //qDebug() << mpiToString(myPoint->Y());
+    qDebug() << mpiToString(myPoint->X());
+    qDebug() << mpiToString(myPoint->Y());
 }
 
 BigWindow::~BigWindow()

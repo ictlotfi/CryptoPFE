@@ -112,18 +112,18 @@ MyPoint *ECC_BIG::addDouble(MyPoint *point)
     p_x = point->X();
     p_y = point->Y();
 
-    mpi_fill_random(&n, 256, generateRNG, NULL);
-    qDebug() << "p_x" << mpiToString(p_x);
-    qDebug() << "n0" << mpiToString(n);
+    //mpi_fill_random(&n, 256, generateRNG, NULL);
+  //  qDebug() << "p_x" << mpiToString(p_x);
+    //qDebug() << "n0" << mpiToString(n);
 
     //int n = 3 * point->x() * point->x() + a ;
     mpi_mul_mpi(&n, &p_x, &p_x);
-    qDebug() << "n1" << mpiToString(n);
+    //qDebug() << "n1" << mpiToString(n);
 
     mpi_mul_int(&n, &n, 3);
-    qDebug() << "n2" << mpiToString(n);
-    mpi_add_int(&n, &n, 1);
-    qDebug() << "n3" << mpiToString(n);
+   // qDebug() << "n2" << mpiToString(n);
+    mpi_add_int(&n, &n, a);
+   // qDebug() << "n3" << mpiToString(n);
 
     /*int d = 2 * point->y();
     if (d < 0) {
@@ -132,11 +132,15 @@ MyPoint *ECC_BIG::addDouble(MyPoint *point)
     }
     */
     mpi_mul_int(&d, &p_y, 2);
+   // qDebug() << "p_y" << mpiToString(p_y);
+   // qDebug() << "d0" << mpiToString(d);
     if (mpi_cmp_int(&d, 0) == -1){
         mpi_mul_int(&n, &n, -1);
         mpi_mul_int(&d, &d, -1);
+        qDebug() << "d1" << mpiToString(d);
+        qDebug() << "n4" << mpiToString(n);
     }
-//qDebug() << "d" << mpiToString(d);
+
     /*
     int x = InvMod(d, p);
     if (n * x > 0) {
@@ -185,6 +189,7 @@ MyPoint *ECC_BIG::addDouble(MyPoint *point)
         mpi_mod_mpi(&temp_x_public, &xr_, &p);
     }
 
+    qDebug() << "temp_x_public" << mpiToString(temp_x_public);
     /*
     int yr_ = (-point->y() + s * (point->x() - temp_x_public));
     if (yr_ < 0)
@@ -206,7 +211,7 @@ MyPoint *ECC_BIG::addDouble(MyPoint *point)
     else {
         mpi_mod_mpi(&temp_y_public, &yr_, &p);
     }
-
+qDebug() << "temp_y_public" << mpiToString(temp_y_public);
     // return new QPoint(temp_x_public, temp_y_public);
     return new MyPoint(temp_x_public, temp_y_public);
 }
