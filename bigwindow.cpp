@@ -9,31 +9,35 @@ BigWindow::BigWindow(QWidget *parent) :
 
     QTime time = QTime::currentTime();
     qsrand((uint)time.msec());
+    ecc_big = new ECC_BIG();
 
     private_key_a = "20723429452102997097693055120908112174847588083791179561894667245437";
     private_key_b = "26783546327533480407843357618229179705380334259814175764895254907511";
 
-    int k = 224;
-    char buff[k];
-    size_t nlen = k;
-    QString text = "";
     mpi number; mpi_init(&number);
-/*
-    //mpi_fill_random(&message, 20, generateRNG, NULL);
-    mpi_gen_prime( &message, k, 0, generateRNG, NULL );
-    mpi_write_string( &message, 10, buff, &nlen);
 
-    for( int i = 0; i < 68; i++ ){
-        number += buff[i];
-    }
-    qDebug() << number << " size: " << number.size();*/
-    //ui->lineEdit_p->setText(number);
 
-    number = stringToMPI(private_key_a);
+    /*number = stringToMPI(private_key_a);
 
     text = mpiToString(number);
 
-    qDebug() << text;
+    qDebug() << text;*/
+
+    // creating base point
+    MyPoint *myPoint = new MyPoint();
+    mpi base_x, base_y;
+    mpi_init(&base_x);mpi_init(&base_y);
+
+    base_x = stringToMPI(ui->lineEdit_base_x->text());
+    base_y = stringToMPI(ui->lineEdit_base_y->text());
+
+    myPoint->setX(base_x);
+    myPoint->setY(base_y);
+
+    //ecc_big->setBasePoint(myPoint);
+    myPoint = ecc_big->addDouble(myPoint);
+    //qDebug() << mpiToString(myPoint->X());
+    //qDebug() << mpiToString(myPoint->Y());
 }
 
 BigWindow::~BigWindow()
@@ -91,7 +95,7 @@ mpi BigWindow::stringToMPI(QString text)
 
 QString BigWindow::mpiToString(mpi number)
 {
-    int k = 224;
+    int k = 512;
     char buff[k];
     size_t nlen = k;
     QString text = "";

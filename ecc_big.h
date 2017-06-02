@@ -5,12 +5,13 @@
 #include "cm.h"
 #include "bignum.h"
 #include "mypoint.h"
+#include <qglobal.h>
+#include <QTime>
 
-
-class ecc_big
+class ECC_BIG
 {
 public:
-    ecc_big();
+    ECC_BIG();
     void setA(int a);
     void setB(mpi b);
     void setP(mpi p);
@@ -24,7 +25,7 @@ public:
     mpi getPrivateKey();
     MyPoint *getBasePoint();
 
-    MyPoint *encryptPoint(MyPoint *p_new, int k);
+    MyPoint *encryptPoint(MyPoint *p_new, mpi k);
     MyPoint *decryptPoint(MyPoint *p);
     MyPoint *addDouble(MyPoint *point);
     MyPoint *addPoints(MyPoint *point1, MyPoint *point2);
@@ -34,6 +35,9 @@ public:
     MyPoint *generatePoint(int m);
     QList<MyPoint *> *textToPoints(QString text);
     int charToCode(QChar ch);
+    mpi NegModMPI(mpi *a, mpi *p);
+    QString mpiToString(mpi number);
+    static int generateRNG(void *, unsigned char * buffer, size_t numBytes);
 
 
 private:

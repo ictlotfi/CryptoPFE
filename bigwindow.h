@@ -28,6 +28,7 @@ public:
 private:
     Ui::BigWindow *ui;
     QString private_key_a, private_key_b;
+    ECC_BIG *ecc_big;
 };
 
 #endif // BIGWINDOW_H
