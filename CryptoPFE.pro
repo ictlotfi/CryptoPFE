@@ -28,13 +28,24 @@ SOURCES += main.cpp\
     ecc.cpp \
     rsa.cpp \
     millerrabin.cpp \
-    cm.cpp
+    cm.cpp \
+    bignum.c \
+    ecc_big.cpp \
+    mypoint.cpp \
+    bigwindow.cpp
 
 HEADERS  += mainwindow.h \
     ecc.h \
     rsa.h \
     millerrabin.h \
     alphabet.h \
-    cm.h
+    cm.h \
+    bn_mul.h \
+    bignum.h \
+    config.h \
+    ecc_big.h \
+    mypoint.h \
+    bigwindow.h
 
-FORMS    += mainwindow.ui
+FORMS    += mainwindow.ui \
+    bigwindow.ui

@@ -9,7 +9,7 @@
 #include "cm.h"
 #include <qglobal.h>
 #include <QTime>
-
+#include "bignum.h"
 
 namespace Ui {
 class MainWindow;
@@ -33,6 +33,7 @@ public:
     void generate_public_key_alice(int private_key);
     void generate_public_key_bob(int private_key);
     int generateRandomNumber();
+    static int generateRNG(void *, unsigned char * buffer, size_t numBytes);
 
 private slots:
     void on_lineEdit_p_textChanged(const QString &);

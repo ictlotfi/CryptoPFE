@@ -1,4 +1,5 @@
 #include "mainwindow.h"
+#include "bigwindow.h"
 #include <QApplication>
 
 
@@ -6,7 +7,7 @@
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
-    MainWindow w;
+    BigWindow w;
     w.show();
 
 

@@ -43,11 +43,56 @@ MainWindow::MainWindow(QWidget *parent) :
      QRegExp validatorNumeric("[0-9]*");
      ui->lineEdit_private_key_alice->setValidator(new QRegExpValidator(validatorNumeric, ui->lineEdit_private_key_alice));
      ui->lineEdit_private_key_bob->setValidator(new QRegExpValidator(validatorNumeric, ui->lineEdit_private_key_bob));
+
+     // mpi
+     mpi message; mpi_init(&message);
+
+
+     //mpi_fill_random(&message, 20, generateRNG, NULL);
+
+    int i;
+    int k = 160;
+    char buff[k];
+    size_t nlen = k;
+
+    //int val = mpi_write_string( &message, 10, buff, &nlen);
+
+    //qDebug() << "val " << val;
+    QString number = "1417719915833702755240932724260316000962279491175";
+    QString num2 = "";
+    for( i = 0; i < 49; i++ ){
+        //qDebug() << i<< ", " << buff[i];
+        number += buff[i];
+    }
+    //qDebug() << number;
+
+    for (int i = 0; i < number.size(); i++){
+        buff[i] = number.at(i).toLatin1();
+    }
+    mpi_read_string( &message, 10, buff);
+
+    mpi_write_string( &message, 10, buff, &nlen);
+
+    for( i = 0; i < 49; i++ ){
+        num2 += buff[i];
+    }
+
+    qDebug() << num2;
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
+}
+
+/**
+    Toy random number generation function. Not suitable for rea crypto use due to weak RNG generator!!!
+*/
+int MainWindow::generateRNG(void *, unsigned char * buffer, size_t numBytes) {
+    for (size_t i = 0; i < numBytes; i++) {
+        buffer[i] = qrand() % 256;
+    }
+    return 0;
 }
 
 void MainWindow::generate_equation()
