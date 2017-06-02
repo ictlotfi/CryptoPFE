@@ -7,6 +7,8 @@
 #include <QDebug>
 #include "ecc.h"
 #include "cm.h"
+#include <qglobal.h>
+#include <QTime>
 
 
 namespace Ui {
@@ -27,8 +29,10 @@ public:
     static int InvMod(int x, int n) ;
     void scalar_multiplicaiton (int xp, int yp, int k, int a, int p, int &PUx, int &PUy);
     static int EGCD(int a, int b, int& u, int &v);
-    QPoint *encrypt(QPoint *p);
     void generatePublicKeys();
+    void generate_public_key_alice(int private_key);
+    void generate_public_key_bob(int private_key);
+    int generateRandomNumber();
 
 private slots:
     void on_lineEdit_p_textChanged(const QString &);
@@ -45,11 +49,13 @@ private slots:
 
     void on_button_select_message_clicked();
 
-    void on_button_generate_cipher_clicked();
-
     void on_button_generate_public_key_bob_clicked();
 
     void on_button_encode_message_clicked();
+
+    void on_lineEdit_private_key_alice_textChanged(const QString &arg1);
+
+    void on_lineEdit_private_key_bob_textChanged(const QString &arg1);
 
 private:
     Ui::MainWindow *ui;

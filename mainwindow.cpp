@@ -10,6 +10,8 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    QTime time = QTime::currentTime();
+    qsrand((uint)time.msec());
     this->showMaximized();
 
      model = new QStringListModel(this);
@@ -23,6 +25,8 @@ MainWindow::MainWindow(QWidget *parent) :
      on_button_generate_ec_points_clicked();
 
      generatePublicKeys();
+     on_button_generate_public_key_alice_clicked();
+     on_button_generate_public_key_bob_clicked();
 }
 
 MainWindow::~MainWindow()
@@ -36,7 +40,7 @@ void MainWindow::generate_equation()
     int a = ui->lineEdit_a->text().toInt();
     int b = ui->lineEdit_b->text().toInt();
 
-    QString equation = "Y² = X3 ";
+    QString equation = "Y^2 = X^3 ";
     if( a>0)  equation += " +" +QString::number(a) +"X ";
     else equation += " " +QString::number(a) +"X ";
 
@@ -134,64 +138,7 @@ void MainWindow::on_button_select_base_clicked()
 
 }
 
-void MainWindow::on_button_generate_public_key_alice_clicked()
-{
-    //if(ui->listView_ec_points->currentIndex().row() < 0) return;
-    int p = ui->lineEdit_p->text().toInt();
-    int a = ui->lineEdit_a->text().toInt();
-    int b = ui->lineEdit_b->text().toInt();
-    int private_key = ui->lineEdit_private_key_alice->text().toInt();
 
-    if (private_key>= p || private_key < 1){
-        QMessageBox msgBox;
-        msgBox.setText("The private key is not between 1 and p-1");
-        msgBox.exec();
-
-        return;
-    }
-
-    QStringList telmpList = ui->listView_ec_points->currentIndex().data().toString().split(",");
-    //x = telmpList.at(0);
-    //y = telmpList.at(1);
-    QString x, y;
-    x = ui->lineEdit_base_x->text();
-    y = ui->lineEdit_base_y->text();
-
-    QPoint *base_point = new QPoint(x.toInt(), y.toInt());
-    ecc_main = new ECC();
-    ecc_main->setA(a);
-    ecc_main->setB(b);
-    ecc_main->setP(p);
-    ecc_main->setBasePoint(base_point);
-    ecc_main->setPrivateKey(private_key);
-
-    //qDebug() << ecc->getPublicKey()->x();
-    ui->lineEdit_public_key_alice->setText(QString::number(ecc_main->getPublicKey()->x()) + ", " +
-                                                     QString::number(ecc_main->getPublicKey()->y()));
-
-}
-
-
-QPoint *MainWindow::encrypt(QPoint *p)
-{
-    /*
-     *
-    int xr, yr;
-    scalar_multiplicaiton(PUx, PUy, k, a, p, xr, yr);
-    add_points(Mx, My, xr, yr, Cx, Cy, p);
-     *
-    */
-    ecc_main->setBasePoint(ecc_main->getPublicKey());
-
-
-    ecc_main->setBasePoint(p);
-    //ecc_main->addPoints();
-
-    QPoint *cipher = ecc_main->getPublicKey();
-
-    ui->lineEdit_cipher->setText(QString::number(cipher->x()) + ", " +
-                                 QString::number(cipher->y()));
-}
 
 void MainWindow::generatePublicKeys()
 {
@@ -205,22 +152,76 @@ void MainWindow::generatePublicKeys()
     peer_public_key_b = ecc_main->encryptPoint(base_point, private_key_b);
 }
 
+void MainWindow::generate_public_key_alice(int private_key)
+{
+    int p = ui->lineEdit_p->text().toInt();
+    int a = ui->lineEdit_a->text().toInt();
+    int b = ui->lineEdit_b->text().toInt();
+
+    if (private_key>= p || private_key < 1){
+        QMessageBox msgBox;
+        msgBox.setText("The private key is not between 1 and p-1");
+        msgBox.exec();
+
+        return;
+    }
+
+    QString x, y;
+    x = ui->lineEdit_base_x->text();
+    y = ui->lineEdit_base_y->text();
+
+    QPoint *base_point = new QPoint(x.toInt(), y.toInt());
+    ecc_main = new ECC();
+    ecc_main->setA(a);
+    ecc_main->setB(b);
+    ecc_main->setP(p);
+
+    QPoint *point = ecc_main->encryptPoint(base_point, private_key);
+
+    ui->lineEdit_public_key_alice->setText(QString::number(point->x()) + ", " +
+                                                     QString::number(point->y()));
+}
+
+void MainWindow::generate_public_key_bob(int private_key)
+{
+    int p = ui->lineEdit_p->text().toInt();
+    int a = ui->lineEdit_a->text().toInt();
+    int b = ui->lineEdit_b->text().toInt();
+
+    if (private_key>= p || private_key < 1){
+        QMessageBox msgBox;
+        msgBox.setText("The private key is not between 1 and p-1");
+        msgBox.exec();
+
+        return;
+    }
+    QString x, y;
+    x = ui->lineEdit_base_x->text();
+    y = ui->lineEdit_base_y->text();
+
+    QPoint *base_point = new QPoint(x.toInt(), y.toInt());
+    ecc_main = new ECC();
+    ecc_main->setA(a);
+    ecc_main->setB(b);
+    ecc_main->setP(p);
+
+     QPoint *point = ecc_main->encryptPoint(base_point, private_key);
+
+    //qDebug() << ecc->getPublicKey()->x();
+    ui->lineEdit_public_key_bob->setText(QString::number(point->x()) + ", " +
+                                         QString::number(point->y()));
+}
+
+int MainWindow::generateRandomNumber()
+{
+    int p = ui->lineEdit_p->text().toInt();
+    return qrand() % ((p + 1) - 1) + 1;
+}
+
 void MainWindow::on_button_select_message_clicked()
 {
     if(ui->listView_ec_points->currentIndex().row() < 0) return;
     ui->lineEdit_message->setText(ui->listView_ec_points->currentIndex().data().toString());
-}
-
-void MainWindow::on_button_generate_cipher_clicked()
-{
-    QString x, y;
-    QStringList telmpList = ui->lineEdit_message->text().split(",");
-    x = telmpList.at(0);
-    y = telmpList.at(1);
-
-    QPoint *p = new QPoint(x.toInt(), y.toInt());
-
-    QPoint *p_encrypted = encrypt(p);
 }
 
 int premier (long n) {
@@ -234,37 +235,15 @@ int premier (long n) {
   return 1;
 }
 
+void MainWindow::on_button_generate_public_key_alice_clicked()
+{
+    int private_key = generateRandomNumber();
+    ui->lineEdit_private_key_alice->setText(QString::number(private_key));
+}
 void MainWindow::on_button_generate_public_key_bob_clicked()
 {
-    if(ui->listView_ec_points->currentIndex().row() < 0) return;
-    int p = ui->lineEdit_p->text().toInt();
-    int a = ui->lineEdit_a->text().toInt();
-    int b = ui->lineEdit_b->text().toInt();
-    int private_key = ui->lineEdit_private_key_bob->text().toInt();
-
-    if (private_key>= p || private_key < 1){
-        QMessageBox msgBox;
-        msgBox.setText("The private key is not between 1 and p-1");
-        msgBox.exec();
-
-        return;
-    }
-    QString x, y;
-    QStringList telmpList = ui->listView_ec_points->currentIndex().data().toString().split(",");
-    x = telmpList.at(0);
-    y = telmpList.at(1);
-
-    QPoint *base_point = new QPoint(x.toInt(), y.toInt());
-    ecc_main = new ECC();
-    ecc_main->setA(a);
-    ecc_main->setB(b);
-    ecc_main->setP(p);
-    ecc_main->setBasePoint(base_point);
-    ecc_main->setPrivateKey(private_key);
-
-    //qDebug() << ecc->getPublicKey()->x();
-    ui->lineEdit_public_key_bob->setText(QString::number(ecc_main->getPublicKey()->x()) + ", " +
-                                                     QString::number(ecc_main->getPublicKey()->y()));
+    int private_key = generateRandomNumber();
+    ui->lineEdit_private_key_bob->setText(QString::number(private_key));
 }
 
 void MainWindow::on_button_encode_message_clicked()
@@ -307,4 +286,16 @@ void MainWindow::on_button_encode_message_clicked()
         qDebug() << "pp2->x() " << pp2->x();
         qDebug() << "pp2->y() " << pp2->y();
     }
+}
+
+void MainWindow::on_lineEdit_private_key_alice_textChanged(const QString &arg1)
+{
+    int private_key = arg1.toInt();
+    generate_public_key_alice(private_key);
+}
+
+void MainWindow::on_lineEdit_private_key_bob_textChanged(const QString &arg1)
+{
+    int private_key = arg1.toInt();
+    generate_public_key_bob(private_key);
 }
