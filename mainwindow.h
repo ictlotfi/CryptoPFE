@@ -57,6 +57,8 @@ private slots:
 
     void on_lineEdit_private_key_bob_textChanged(const QString &arg1);
 
+    void on_lineEdit_message_textChanged(const QString &arg1);
+
 private:
     Ui::MainWindow *ui;
     QStringListModel *model;

@@ -13,20 +13,36 @@ MainWindow::MainWindow(QWidget *parent) :
     QTime time = QTime::currentTime();
     qsrand((uint)time.msec());
     this->showMaximized();
+    ecc_main = new ECC();
 
      model = new QStringListModel(this);
+
+     //private_key_a = 17;
+     //private_key_b = 19;
+
+     //k_a = 8;//generateRandomNumber();
+     //k_b = 12;//generateRandomNumber();
+
      k_a = 11;
      k_b = 15;
-     private_key_a = 17;
-     private_key_b = 19;
-
+     //private_key_a = 17;
+     //private_key_b = 19;
 
      generate_equation();
      on_button_generate_ec_points_clicked();
 
-     generatePublicKeys();
+
      on_button_generate_public_key_alice_clicked();
      on_button_generate_public_key_bob_clicked();
+
+     //generatePublicKeys();
+
+     QRegExp validatorAlphaNumeric("[A-Za-z0-9]*");
+     ui->lineEdit_message->setValidator(new QRegExpValidator(validatorAlphaNumeric, ui->lineEdit_message));
+
+     QRegExp validatorNumeric("[0-9]*");
+     ui->lineEdit_private_key_alice->setValidator(new QRegExpValidator(validatorNumeric, ui->lineEdit_private_key_alice));
+     ui->lineEdit_private_key_bob->setValidator(new QRegExpValidator(validatorNumeric, ui->lineEdit_private_key_bob));
 }
 
 MainWindow::~MainWindow()
@@ -57,7 +73,6 @@ void MainWindow::generate_equation()
     y = ui->lineEdit_base_y->text();
     QPoint *base_point = new QPoint(x.toInt(), y.toInt());
 
-    ecc_main = new ECC();
     ecc_main->setA(a);
     ecc_main->setB(b);
     ecc_main->setP(p);
@@ -86,7 +101,7 @@ void MainWindow::on_button_generate_ec_points_clicked()
     int a = ui->lineEdit_a->text().toInt();
     int b = ui->lineEdit_b->text().toInt();
     // verify if p is a prime number
-    MillerRabin *m = new MillerRabin();
+    /*MillerRabin *m = new MillerRabin();
     if(!m->isPrime(p)){
         QMessageBox msgBox;
         msgBox.setText("P is not prime");
@@ -94,7 +109,7 @@ void MainWindow::on_button_generate_ec_points_clicked()
 
         qDebug() << p << " is NOT prime";
         return;
-    }
+    }*/
 
     // verify is 4A^3+27b^2 <> 0
 
@@ -148,8 +163,15 @@ void MainWindow::generatePublicKeys()
 
     QPoint *base_point = new QPoint(x.toInt(), y.toInt());
 
+    private_key_a = ui->lineEdit_private_key_alice->text().toInt();
+    private_key_b = ui->lineEdit_private_key_bob->text().toInt();
+
     peer_public_key_a = ecc_main->encryptPoint(base_point, private_key_a);
     peer_public_key_b = ecc_main->encryptPoint(base_point, private_key_b);
+
+    qDebug() << "wwwprivate_key_b " << private_key_b;
+    qDebug() << "wwwpeer_public_key_b->x() " << peer_public_key_b->x();
+    qDebug() << "wwwpeer_public_key_b->y() " << peer_public_key_b->y();
 }
 
 void MainWindow::generate_public_key_alice(int private_key)
@@ -171,7 +193,6 @@ void MainWindow::generate_public_key_alice(int private_key)
     y = ui->lineEdit_base_y->text();
 
     QPoint *base_point = new QPoint(x.toInt(), y.toInt());
-    ecc_main = new ECC();
     ecc_main->setA(a);
     ecc_main->setB(b);
     ecc_main->setP(p);
@@ -180,6 +201,11 @@ void MainWindow::generate_public_key_alice(int private_key)
 
     ui->lineEdit_public_key_alice->setText(QString::number(point->x()) + ", " +
                                                      QString::number(point->y()));
+
+    private_key_a = ui->lineEdit_private_key_alice->text().toInt();
+    peer_public_key_a = ecc_main->encryptPoint(base_point, private_key_a);
+
+
 }
 
 void MainWindow::generate_public_key_bob(int private_key)
@@ -200,16 +226,20 @@ void MainWindow::generate_public_key_bob(int private_key)
     y = ui->lineEdit_base_y->text();
 
     QPoint *base_point = new QPoint(x.toInt(), y.toInt());
-    ecc_main = new ECC();
     ecc_main->setA(a);
     ecc_main->setB(b);
     ecc_main->setP(p);
 
      QPoint *point = ecc_main->encryptPoint(base_point, private_key);
 
-    //qDebug() << ecc->getPublicKey()->x();
     ui->lineEdit_public_key_bob->setText(QString::number(point->x()) + ", " +
                                          QString::number(point->y()));
+
+    private_key_b = ui->lineEdit_private_key_bob->text().toInt();
+    peer_public_key_b = ecc_main->encryptPoint(base_point, private_key_b);
+    qDebug() << "private_key_b " << private_key_b;
+    qDebug() << "peer_public_key_b->x() " << peer_public_key_b->x();
+    qDebug() << "peer_public_key_b->y() " << peer_public_key_b->y();
 }
 
 int MainWindow::generateRandomNumber()
@@ -253,6 +283,7 @@ void MainWindow::on_button_encode_message_clicked()
     ui->textEdit_cm_message->clear();
     ui->textEdit_decrypted_message->clear();
 
+
     QString message = ui->lineEdit_message->text();
 
     QList<QPoint*> *list = ecc_main->textToPoints(message.toLower());
@@ -262,11 +293,13 @@ void MainWindow::on_button_encode_message_clicked()
         ui->textEdit_encoded_message->append(encodedPoint);
 
         // encrypt
-        QPoint *p_encrypted = ecc_main->encryptPoint(p, k_b);
+       /* QPoint *p_encrypted = ecc_main->encryptPoint(p, k_b);
         QString encryptedPoint = "("+QString::number(p_encrypted->x())+", "+QString::number(p_encrypted->y())+")";
         ui->textEdit_encrypted_message->append(encryptedPoint);
-
+*/
         // generate CM
+       // qDebug() << "peer_public_key_b->x() " << peer_public_key_b->x();
+        //qDebug() << "peer_public_key_b->y() " << peer_public_key_b->y();
 
         CM *cm = ecc_main->generateCm(k_a, p, peer_public_key_b);
         ui->textEdit_cm_message->append(cm->toString());
@@ -275,17 +308,28 @@ void MainWindow::on_button_encode_message_clicked()
         QPoint *p1 = cm->getP1();
         QPoint *p2 = cm->getP2();
 
-        QPoint *pp1 = ecc_main->encryptPoint(p1, private_key_b); // n_a * (k_a*G)
-        int xx = p2->x() - p1->x();
+        qDebug() << "private_key_b " <<private_key_b;
+
+        QPoint *pp1 = ecc_main->encryptPoint(p1, private_key_b); // n_b * (k_a*G)
+        //int xx = p2->x() - p1->x();
+
         qDebug() << "pp1->x() " << pp1->x();
         qDebug() << "pp1->y() " << pp1->y();
 
         pp1->setY(-pp1->y());
 
         QPoint *pp2 = ecc_main->addPoints(p2, pp1);
+
         qDebug() << "pp2->x() " << pp2->x();
         qDebug() << "pp2->y() " << pp2->y();
     }
+
+    QPoint *p0 = new QPoint(15, 12);
+    QPoint *p00 = new QPoint(15, 1051);
+
+    p0 = ecc_main->addPoints(p0, p00);
+    qDebug() << "qqqq->x() " << p0->x();
+    qDebug() << "qqqq->y() " << p0->y();
 }
 
 void MainWindow::on_lineEdit_private_key_alice_textChanged(const QString &arg1)
@@ -298,4 +342,9 @@ void MainWindow::on_lineEdit_private_key_bob_textChanged(const QString &arg1)
 {
     int private_key = arg1.toInt();
     generate_public_key_bob(private_key);
+}
+
+void MainWindow::on_lineEdit_message_textChanged(const QString &arg1)
+{
+    ui->lineEdit_message->setText(arg1.toUpper());
 }

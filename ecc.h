@@ -43,6 +43,7 @@ public:
     QList<QPoint *> *textToPoints(QString text);
     int charToCode(QChar ch);
     CM *generateCm(int k, QPoint *point, QPoint *peer_public_key);
+
 private:
     int a;
     int b;

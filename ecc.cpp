@@ -31,7 +31,8 @@ void ECC::setPrivateKey(int private_key)
 
 void ECC::setBasePoint(QPoint *p)
 {
-    this->base_point = p;
+    this->base_point->setX(p->x());
+    this->base_point->setY(p->y());
 }
 
 void ECC::setPublicKey(QPoint *p)
