@@ -13,12 +13,12 @@ CM::CM(QPoint *p1, QPoint *p2)
 
 void CM::setP1(QPoint *p)
 {
-    p1 = p;
+    this->p1 = p;
 }
 
 void CM::setP2(QPoint *p)
 {
-    p2 = p;
+    this->p2 = p;
 }
 
 QPoint *CM::getP1()

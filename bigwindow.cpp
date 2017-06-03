@@ -34,11 +34,16 @@ BigWindow::BigWindow(QWidget *parent) :
     base_x = stringToMPI(ui->lineEdit_base_x->text());
     base_y = stringToMPI(ui->lineEdit_base_y->text());
 
+    //base_x = stringToMPI("23495795443371455911734272815198443231796705177085412225858576936196");
+   // base_y = stringToMPI("-17700160899720880345542111108288350775334949041449922981121974179992");
+
+    // 6455442420784385171892731890321939130302256445452508665571987526
+    // 11713622093973467124672938316960118024378453519425273321965577354050
     myPoint->setX(base_x);
     myPoint->setY(base_y);
 
     //ecc_big->setBasePoint(myPoint);
-    myPoint = ecc_big->addDouble(myPoint);
+    myPoint = ecc_big->encryptPoint(myPoint, 4);
     qDebug() << mpiToString(myPoint->X());
     qDebug() << mpiToString(myPoint->Y());
 }
@@ -105,7 +110,7 @@ QString BigWindow::mpiToString(mpi number)
 
     mpi_write_string( &number, 10, buff, &nlen);
 
-    for( int i = 0; i < 68; i++ ){
+    for( int i = 0; i < 69; i++ ){
         text += buff[i];
     }
 

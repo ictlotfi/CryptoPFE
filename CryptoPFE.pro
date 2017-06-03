@@ -32,7 +32,8 @@ SOURCES += main.cpp\
     bignum.c \
     ecc_big.cpp \
     mypoint.cpp \
-    bigwindow.cpp
+    bigwindow.cpp \
+    mycm.cpp
 
 HEADERS  += mainwindow.h \
     ecc.h \
@@ -45,7 +46,8 @@ HEADERS  += mainwindow.h \
     config.h \
     ecc_big.h \
     mypoint.h \
-    bigwindow.h
+    bigwindow.h \
+    mycm.h
 
 FORMS    += mainwindow.ui \
     bigwindow.ui

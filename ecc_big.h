@@ -2,11 +2,11 @@
 #define ECC_BIG_H
 
 #include <QDebug>
-#include "cm.h"
 #include "bignum.h"
 #include "mypoint.h"
 #include <qglobal.h>
 #include <QTime>
+#include "mycm.h"
 
 class ECC_BIG
 {
@@ -25,7 +25,7 @@ public:
     mpi getPrivateKey();
     MyPoint *getBasePoint();
 
-    MyPoint *encryptPoint(MyPoint *p_new, mpi k);
+    MyPoint *encryptPoint(MyPoint *p_new, int k);
     MyPoint *decryptPoint(MyPoint *p);
     MyPoint *addDouble(MyPoint *point);
     MyPoint *addPoints(MyPoint *point1, MyPoint *point2);
@@ -38,6 +38,7 @@ public:
     mpi NegModMPI(mpi *a, mpi *p);
     QString mpiToString(mpi number);
     static int generateRNG(void *, unsigned char * buffer, size_t numBytes);
+    MyCM *generateCm(int k, MyPoint *point, MyPoint *peer_public_key);
 
 
 private:

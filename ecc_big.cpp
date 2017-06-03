@@ -56,46 +56,29 @@ MyPoint *ECC_BIG::getBasePoint()
     return base_point;
 }
 
-MyPoint *ECC_BIG::encryptPoint(MyPoint *p_new, mpi k)
+MyPoint *ECC_BIG::encryptPoint(MyPoint *p_new, int k)
 {
 
-    return NULL;
+    MyPoint *p ;
+
+    if (k == 2) {
+        p = addDouble(p_new);
+    }
+    else if (k > 2) {
+        p = addDouble(p_new);
+        for (int i = 0; i < k - 2; i++) {
+            p = addPoints(p_new, p);
+        }
+    }
+
+    return p;
 }
 
 MyPoint *ECC_BIG::decryptPoint(MyPoint *p)
 {
     return NULL;
 }
-/*
-   int s;
-    int temp_x_public, temp_y_public;
-    int n = 3 * point->x() * point->x() + a ;
-    int d = 2 * point->y();
-    if (d < 0) {
-        n *= -1;
-        d *= -1;
-    }
-    int x = InvMod(d, p);
-    if (n * x > 0) {
-        s = (n * x) % p;
-    }
-    else {
-        s = NegMod(n * x, p);
-    }
-    int xr_ = (s * s - 2 * point->x());
-    if (xr_ < 0)
-    temp_x_public = NegMod (xr_, p);
-    else
-    temp_x_public = xr_ % p;
 
-    int yr_ = (-point->y() + s * (point->x() - temp_x_public));
-    if (yr_ < 0)
-    temp_y_public = NegMod(yr_, p);
-    else
-    temp_y_public = yr_ % p;
-
-    return new QPoint(temp_x_public, temp_y_public);
- */
 MyPoint *ECC_BIG::addDouble(MyPoint *point)
 {
     mpi s, n, p_x, p_y, d;
@@ -156,13 +139,11 @@ MyPoint *ECC_BIG::addDouble(MyPoint *point)
 
     mpi_inv_mod(&x, &d, &p);
     mpi_mul_mpi(&temp0, &x, &n);
-    if (mpi_cmp_int(&temp0, 0) == -1){
-        mpi_mul_mpi(&s, &x, &n);
-        mpi_mod_mpi(&s, &s, &p);
+    if (mpi_cmp_int(&temp0, 0) == 1){
+        mpi_mod_mpi(&s, &temp0, &p);
     }
     else {
-        mpi_mul_mpi(&s, &n, &x);
-        s = NegModMPI(&s, &p);
+        s = NegModMPI(&temp0, &p);
     }
 //qDebug() << "s" << mpiToString(s);
     /*
@@ -189,7 +170,7 @@ MyPoint *ECC_BIG::addDouble(MyPoint *point)
         mpi_mod_mpi(&temp_x_public, &xr_, &p);
     }
 
-    qDebug() << "temp_x_public" << mpiToString(temp_x_public);
+    //qDebug() << "temp_x_public" << mpiToString(temp_x_public);
     /*
     int yr_ = (-point->y() + s * (point->x() - temp_x_public));
     if (yr_ < 0)
@@ -211,14 +192,87 @@ MyPoint *ECC_BIG::addDouble(MyPoint *point)
     else {
         mpi_mod_mpi(&temp_y_public, &yr_, &p);
     }
-qDebug() << "temp_y_public" << mpiToString(temp_y_public);
+//qDebug() << "temp_y_public" << mpiToString(temp_y_public);
     // return new QPoint(temp_x_public, temp_y_public);
     return new MyPoint(temp_x_public, temp_y_public);
 }
 
+
 MyPoint *ECC_BIG::addPoints(MyPoint *point1, MyPoint *point2)
 {
-    return NULL;
+    mpi s, n, p1_x, p1_y, p2_x, p2_y, d;
+    mpi temp_x_public, temp_y_public;
+
+    mpi_init(&s);
+    mpi_init(&n);
+    mpi_init(&p1_x);
+    mpi_init(&p1_y);
+    mpi_init(&p2_x);
+    mpi_init(&p2_y);
+    mpi_init(&d);
+    mpi_init(&temp_x_public);
+    mpi_init(&temp_y_public);
+
+    p1_x = point1->X();
+    p1_y = point1->Y();
+    p2_x = point2->X();
+    p2_y = point2->Y();
+
+    mpi_sub_mpi(&n, &p1_y, &p2_y);
+    mpi_sub_mpi(&d, &p1_x, &p2_x);
+
+    if (mpi_cmp_int(&d, 0) == -1){
+        mpi_mul_int(&n, &n, -1);
+        mpi_mul_int(&d, &d, -1);
+    }
+
+    mpi x, temp0;
+    mpi_init(&x);
+    mpi_init(&temp0);
+
+    mpi_inv_mod(&x, &d, &p);
+    mpi_mul_mpi(&temp0, &x, &n);
+
+    if (mpi_cmp_int(&temp0, 0) == 1){ // temp0 > 0
+        mpi_mod_mpi(&s, &temp0, &p);
+    }
+    else {
+        s = NegModMPI(&temp0, &p);
+    }
+
+    mpi xr_, temp1, temp2;
+    mpi_init(&xr_);
+    mpi_init(&temp1);
+    mpi_init(&temp2);
+
+    mpi_mul_mpi(&temp1, &s, &s);
+    mpi_add_mpi(&temp2, &p1_x, &p2_x);
+    mpi_sub_mpi(&xr_, &temp1, &temp2);
+
+    if (mpi_cmp_int(&xr_, 0) == -1){ //xr_ < 0
+        temp_x_public = NegModMPI(&xr_, &p);
+    }
+    else {
+        mpi_mod_mpi(&temp_x_public, &xr_, &p);
+    }
+
+    mpi yr_, temp3;
+    mpi_init(&yr_);
+    mpi_init(&temp3);
+
+    mpi_sub_mpi(&temp3, &p1_x, &temp_x_public);
+    mpi_mul_mpi(&temp3, &s, &temp3);
+    mpi_sub_mpi(&yr_, &temp3, &p1_y);
+
+    if(mpi_cmp_int(&yr_, 0) == -1){ //yr_ < 0
+        temp_y_public = NegModMPI(&yr_, &p);
+    }
+    else {
+        mpi_mod_mpi(&temp_y_public, &yr_, &p);
+    }
+
+
+    return new MyPoint(temp_x_public, temp_y_public);
 }
 
 MyPoint *ECC_BIG::multPoint(MyPoint *p, int k)
@@ -338,4 +392,13 @@ int ECC_BIG::generateRNG(void *, unsigned char *buffer, size_t numBytes)
         buffer[i] = qrand() % 256;
     }
     return 0;
+}
+
+MyCM *ECC_BIG::generateCm(int k, MyPoint *point, MyPoint *peer_public_key)
+{
+    MyPoint *p1 = encryptPoint(base_point, k);
+    MyPoint *p2 = encryptPoint(peer_public_key, k);
+    p2 = addPoints(point, p2);
+
+    return new MyCM(p1, p2);
 }
