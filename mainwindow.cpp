@@ -44,7 +44,25 @@ MainWindow::MainWindow(QWidget *parent) :
      ui->lineEdit_private_key_alice->setValidator(new QRegExpValidator(validatorNumeric, ui->lineEdit_private_key_alice));
      ui->lineEdit_private_key_bob->setValidator(new QRegExpValidator(validatorNumeric, ui->lineEdit_private_key_bob));
 
-     // mpi
+
+     QPoint *base_point = new QPoint(15, 1051);
+     QPoint *p0 = ecc_main->addDouble(base_point);
+
+     QPoint *p1 = ecc_main->addPoints(p0, base_point);
+     p1 = ecc_main->addPoints(p1, base_point);
+
+     p0 = ecc_main->addDouble(p0);
+
+     qDebug() << "A "<< ecc_main->getA();
+     qDebug() << "B "<< ecc_main->getB();
+     qDebug() << "P "<< ecc_main->getP();
+
+     qDebug() << "p0.x "<< p0->x();
+     qDebug() << "p0.y "<< p0->y();
+     qDebug() << "p1.x "<< p1->x();
+     qDebug() << "p1.y "<< p1->y();
+
+    /* // mpi
      mpi message; mpi_init(&message);
 
 
@@ -77,7 +95,7 @@ MainWindow::MainWindow(QWidget *parent) :
         num2 += buff[i];
     }
 
-    qDebug() << num2;
+    qDebug() << num2;*/
 }
 
 MainWindow::~MainWindow()

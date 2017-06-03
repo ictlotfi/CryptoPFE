@@ -130,7 +130,7 @@ QGroupBox::title {
        <item>
         <widget class="QLineEdit" name="lineEdit_b">
          <property name="text">
-          <string>18958286285566608000408668544493926415504680968679321075787234672564 </string>
+          <string>18958286285566608000408668544493926415504680968679321075787234672564</string>
          </property>
         </widget>
        </item>

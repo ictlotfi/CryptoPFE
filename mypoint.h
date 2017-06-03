@@ -2,6 +2,7 @@
 #define MYPOINT_H
 
 #include "bignum.h"
+#include <QDebug>
 
 
 class MyPoint
@@ -14,6 +15,7 @@ public:
 
     mpi X();
     mpi Y();
+    mpi stringToMPI(QString text);
 
 private:
     mpi x, y;

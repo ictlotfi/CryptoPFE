@@ -74,6 +74,32 @@ MyPoint *ECC_BIG::encryptPoint(MyPoint *p_new, int k)
     return p;
 }
 
+MyPoint *ECC_BIG::encryptPointFast(MyPoint *p_new, int k)
+{
+    MyPoint *q = p_new;
+    MyPoint *r = new MyPoint();
+
+    //if (k == 1) return p_new;
+    while (k > 0) {
+        if (k % 2 == 1){
+            qDebug() << "addPoints" << k;
+            r = addPoints(r, q);
+        }
+        qDebug() << "addDouble" << k;
+        q = addDouble(q);
+        qDebug() << mpiToString(q->X());
+        qDebug() << mpiToString(q->Y());
+        k = k/2;
+    }
+    return r;
+}
+
+
+/*if (k == 0){
+    MyPoint *tt = addPoints(r, q);
+    r = addPoints(r, q);
+    return r;
+}*/
 MyPoint *ECC_BIG::decryptPoint(MyPoint *p)
 {
     return NULL;
@@ -95,44 +121,17 @@ MyPoint *ECC_BIG::addDouble(MyPoint *point)
     p_x = point->X();
     p_y = point->Y();
 
-    //mpi_fill_random(&n, 256, generateRNG, NULL);
-  //  qDebug() << "p_x" << mpiToString(p_x);
-    //qDebug() << "n0" << mpiToString(n);
-
-    //int n = 3 * point->x() * point->x() + a ;
     mpi_mul_mpi(&n, &p_x, &p_x);
-    //qDebug() << "n1" << mpiToString(n);
-
     mpi_mul_int(&n, &n, 3);
-   // qDebug() << "n2" << mpiToString(n);
     mpi_add_int(&n, &n, a);
-   // qDebug() << "n3" << mpiToString(n);
 
-    /*int d = 2 * point->y();
-    if (d < 0) {
-        n *= -1;
-        d *= -1;
-    }
-    */
     mpi_mul_int(&d, &p_y, 2);
-   // qDebug() << "p_y" << mpiToString(p_y);
-   // qDebug() << "d0" << mpiToString(d);
+
     if (mpi_cmp_int(&d, 0) == -1){
         mpi_mul_int(&n, &n, -1);
         mpi_mul_int(&d, &d, -1);
-        qDebug() << "d1" << mpiToString(d);
-        qDebug() << "n4" << mpiToString(n);
     }
 
-    /*
-    int x = InvMod(d, p);
-    if (n * x > 0) {
-        s = (n * x) % p;
-    }
-    else {
-        s = NegMod(n * x, p);
-    }
-    */
     mpi x, temp0;
     mpi_init(&x);
     mpi_init(&temp0);
@@ -145,14 +144,6 @@ MyPoint *ECC_BIG::addDouble(MyPoint *point)
     else {
         s = NegModMPI(&temp0, &p);
     }
-//qDebug() << "s" << mpiToString(s);
-    /*
-     * int xr_ = (s * s - 2 * point->x());
-    if (xr_ < 0)
-    temp_x_public = NegMod (xr_, p);
-    else
-    temp_x_public = xr_ % p;
-    */
 
     mpi xr_, temp1, temp2;
     mpi_init(&xr_);
@@ -170,14 +161,6 @@ MyPoint *ECC_BIG::addDouble(MyPoint *point)
         mpi_mod_mpi(&temp_x_public, &xr_, &p);
     }
 
-    //qDebug() << "temp_x_public" << mpiToString(temp_x_public);
-    /*
-    int yr_ = (-point->y() + s * (point->x() - temp_x_public));
-    if (yr_ < 0)
-    temp_y_public = NegMod(yr_, p);
-    else
-    temp_y_public = yr_ % p;
-    */
     mpi yr_, temp3;
     mpi_init(&yr_);
     mpi_init(&temp3);
@@ -192,8 +175,7 @@ MyPoint *ECC_BIG::addDouble(MyPoint *point)
     else {
         mpi_mod_mpi(&temp_y_public, &yr_, &p);
     }
-//qDebug() << "temp_y_public" << mpiToString(temp_y_public);
-    // return new QPoint(temp_x_public, temp_y_public);
+
     return new MyPoint(temp_x_public, temp_y_public);
 }
 
@@ -217,6 +199,18 @@ MyPoint *ECC_BIG::addPoints(MyPoint *point1, MyPoint *point2)
     p1_y = point1->Y();
     p2_x = point2->X();
     p2_y = point2->Y();
+
+    // test if no one of the points is an infinite number
+
+    if ((mpi_cmp_int(&p1_x, 0) == 0) && (mpi_cmp_int(&p1_y, 0) == 0)) {
+        //qDebug() << "p1 is infinite";
+        MyPoint *pppp = new MyPoint(point2->X(), point2->Y());
+        return pppp;
+    }
+    if ((mpi_cmp_int(&p2_x, 0) == 0) && (mpi_cmp_int(&p2_y, 0) == 0)) {
+       // qDebug() << "p2 is infinite";
+        return new MyPoint(point1->X(), point1->Y());
+    }
 
     mpi_sub_mpi(&n, &p1_y, &p2_y);
     mpi_sub_mpi(&d, &p1_x, &p2_x);
@@ -270,7 +264,6 @@ MyPoint *ECC_BIG::addPoints(MyPoint *point1, MyPoint *point2)
     else {
         mpi_mod_mpi(&temp_y_public, &yr_, &p);
     }
-
 
     return new MyPoint(temp_x_public, temp_y_public);
 }
