@@ -16,6 +16,11 @@ BigWindow::BigWindow(QWidget *parent) :
     generate_equation();
     generatePrivateKeys();
     generatePublicKeys();
+    generateRandomK();
+
+
+    QRegExp validatorAlphaNumeric("[A-Za-z0-9]*");
+    ui->lineEdit_message->setValidator(new QRegExpValidator(validatorAlphaNumeric, ui->lineEdit_message));
 
 
     mpi numberB; mpi_init(&numberB);
@@ -252,21 +257,111 @@ void BigWindow::generatePublicKeys()
     ui->textEdit_public_key_bob->setText(public_key_b->toString());
 }
 
+void BigWindow::generateRandomK()
+{
+    mpi_init(&k_a);mpi_init(&k_b);
+    k_a = ecc_big->generatePrivateKey();
+    k_b = ecc_big->generatePrivateKey();
+}
+
+QList<MyCM *> BigWindow::textToMyCMList(QString text)
+{
+    QList<MyCM *> myCMList = QList<MyCM *>();
+    QStringList list = text.split("#");
+    for (int i = 0; i < list.size(); i++){
+        //qDebug() << list.at(i);
+        MyCM *myCM = stringToMyCM(list.at(i));
+        qDebug() << myCM->toString();
+        myCMList.append(myCM);;
+    }
+    return myCMList;
+}
+
+MyCM *BigWindow::stringToMyCM(QString arg0)
+{
+    MyPoint *p1 = new MyPoint();
+    MyPoint *p2 = new MyPoint();
+    int counter = 0;
+    QString temp = "";
+    QString arg = arg0;
+    arg.replace(" ", "");
+    arg.replace("\n", "");
+    arg.replace("#", "");
+
+    qDebug() << "arg: " << arg;
+
+    if (arg.startsWith("{") && arg.endsWith("}")){
+        arg.replace("{", "");
+        arg.replace("}", "");
+        arg.replace("(", "");
+        arg.replace(")", "");
+
+
+        for (int i = 0; i < arg.size(); i++){
+            if (arg.at(i) != ',') temp+= arg.at(i);
+            else {
+                if (counter == 0){
+                    p1->setX(stringToMPI(temp));
+                    temp = "";
+                }
+                else if (counter == 1){
+                    p1->setY(stringToMPI(temp));
+                    temp = "";
+                }
+                else if (counter == 2){
+                    p2->setX(stringToMPI(temp));
+                    temp = "";
+                }
+
+                counter++;
+            }
+        }
+        p2->setY(stringToMPI(temp));
+
+    }
+    return new MyCM(p1, p2);
+}
+
+QString BigWindow::myCMListToString(QList<MyCM *> list)
+{
+    QString temp = "";
+    for (int i=0; i < list.size(); i++){
+        temp += list.at(i)->toString();
+        if (i != list.size()-1) temp+= "#";
+
+    }
+    return temp;
+}
+
 void BigWindow::on_button_encode_message_clicked()
 {
-    ui->textEdit_encoded_message->clear();
     ui->textEdit_encrypted_message->clear();
-    ui->textEdit_cm_message->clear();
-    ui->textEdit_decrypted_message->clear();
 
     QString message = ui->lineEdit_message->text();
 
     QList<MyPoint*> *list = ecc_big->textToPoints(message.toLower());
-
+    QString temp = "";
     for (int i = 0; i < list->size(); i++){
         MyPoint *p = list->at(i);
-        QString encodedPoint = p->toString();
-        ui->textEdit_encoded_message->append(encodedPoint);
-        break;
+
+        // generate CM
+        MyCM *cm = ecc_big->generateCm(k_a, p, public_key_b);
+        temp = cm->toString();
+        if (i != list->size()-1) temp +="#";
+
+        ui->textEdit_encrypted_message->append(temp);
     }
+}
+
+void BigWindow::on_lineEdit_message_textChanged(const QString &arg1)
+{
+    ui->lineEdit_message->setText(arg1.toUpper());
+}
+
+void BigWindow::on_button_decrypt_message_clicked()
+{
+    QString text = ui->textEdit_encrypted_message->toPlainText();
+    QList<MyCM *> list = textToMyCMList(text);
+    ui->textEdit_encrypted_message_received->clear();
+    ui->textEdit_encrypted_message_received->append(myCMListToString(list));
 }

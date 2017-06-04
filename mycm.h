@@ -13,7 +13,10 @@ public:
     void setP2(MyPoint *p);
     MyPoint *getP1();
     MyPoint *getP2();
+    static mpi stringToMPI(QString text);
+    QString mpiToString(mpi number);
     QString toString();
+
 
 private:
     MyPoint *p1, *p2;
