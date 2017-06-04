@@ -14,15 +14,15 @@ BigWindow::BigWindow(QWidget *parent) :
     qsrand((uint)time.msec());
     ecc_big = new ECC_BIG();
     generate_equation();
+    generatePrivateKeys();
+    generatePublicKeys();
 
-    private_key_a = "20723429452102997097693055120908112174847588083791179561894667245437";
-    private_key_b = "26783546327533480407843357618229179705380334259814175764895254907511";
 
-   // mpi numberB; mpi_init(&numberB);
-   // mpi numberP; mpi_init(&numberP);
+    mpi numberB; mpi_init(&numberB);
+    mpi numberP; mpi_init(&numberP);
 
-   // numberB = stringToMPI("18958286285566608000408668544493926415504680968679321075787234672564");
-   // numberP = stringToMPI("26959946667150639794667015087019630673557916260026308143510066298881");
+    numberB = stringToMPI("18958286285566608000408668544493926415504680968679321075787234672564");
+    numberP = stringToMPI("26959946667150639794667015087019630673557916260026308143510066298881");
   //  ecc_big->setB(stringToMPI("3"));
   // ecc_big->setP(stringToMPI("1063"));
 
@@ -56,7 +56,7 @@ BigWindow::BigWindow(QWidget *parent) :
     //ecc_big->setBasePoint(myPoint);
 
     mpi k; mpi_init(&k);
-    k = stringToMPI("26783546327533480407843357618229179705380334259814175764895254907511");
+    k = ecc_big->generatePrivateKey();
     myPoint1 = ecc_big->encryptPointFast(myPoint, k);
 
 
@@ -68,9 +68,11 @@ BigWindow::BigWindow(QWidget *parent) :
 
 
 
+   /* qDebug() << "k " << mpiToString(k);
+
 
     qDebug() << "myPoint1.X " << mpiToString(myPoint1->X());
-    qDebug() << "myPoint1.Y " << mpiToString(myPoint1->Y());
+    qDebug() << "myPoint1.Y " << mpiToString(myPoint1->Y());*/
 
    /* qDebug() << "myPoint0.X " << mpiToString(myPoint0->X());
     qDebug() << "myPoint0.Y " << mpiToString(myPoint0->Y());*/
@@ -95,7 +97,10 @@ BigWindow::BigWindow(QWidget *parent) :
     qDebug() << "base_x " << mpiToString(base_x);
     qDebug() << "base_y " << mpiToString(base_y);
 */
-   /* mpi t0, t1, t3;
+
+  /*  base_x = myPoint1->X();
+    base_y = myPoint1->Y();
+    mpi t0, t1, t3;
     mpi_init(&t0);mpi_init(&t1);mpi_init(&t3);
 
 
@@ -139,10 +144,21 @@ void BigWindow::generate_equation()
 
     ui->label_ec_equation->setText(equation);
 
+    MyPoint *myPoint = new MyPoint();
+    mpi base_x, base_y;
+    mpi_init(&base_x);mpi_init(&base_y);
+
+    base_x = stringToMPI(ui->lineEdit_base_x->text());
+    base_y = stringToMPI(ui->lineEdit_base_y->text());
+    myPoint->setX(base_x);
+    myPoint->setY(base_y);
+
+
 
     ecc_big->setA(ui->lineEdit_a->text().toInt());
     ecc_big->setB(stringToMPI(ui->lineEdit_b->text()));
     ecc_big->setP(stringToMPI(ui->lineEdit_p->text()));
+    ecc_big->setBasePoint(myPoint);
 }
 
 int BigWindow::generateRNG(void *, unsigned char *buffer, size_t numBytes)
@@ -205,9 +221,33 @@ QString BigWindow::mpiToString(mpi number)
 
     mpi_write_string( &number, 10, buff, &nlen);
 
-    for( int i = 0; i < 69; i++ ){
-        text += buff[i];
+    for( int i = 0; i < k; i++ ){
+        if (buff[i] == '0' || buff[i] == '1' || buff[i] == '2' || buff[i] == '3' || buff[i] == '4' || buff[i] == '5'
+                || buff[i] == '6' || buff[i] == '7' || buff[i] == '8' || buff[i] == '9')  text += buff[i];
+        else return text;
     }
 
     return text;
+}
+
+void BigWindow::generatePrivateKeys()
+{
+    mpi_init(&private_key_a);mpi_init(&private_key_b);
+    private_key_a = ecc_big->generatePrivateKey();
+    private_key_b = ecc_big->generatePrivateKey();
+
+    qDebug() << "private_key_a " << mpiToString(private_key_a);
+    qDebug() << "private_key_b " << mpiToString(private_key_b);
+
+    ui->textEdit_private_key_alice->setText(mpiToString(private_key_a));
+    ui->textEdit_private_key_bob->setText(mpiToString(private_key_b));
+}
+
+void BigWindow::generatePublicKeys()
+{
+    public_key_a = ecc_big->encryptPointFast(ecc_big->getBasePoint(), private_key_a);
+    public_key_b = ecc_big->encryptPointFast(ecc_big->getBasePoint(), private_key_b);
+
+    ui->textEdit_public_key_alice->setText(public_key_a->toString());
+    ui->textEdit_public_key_bob->setText(public_key_b->toString());
 }

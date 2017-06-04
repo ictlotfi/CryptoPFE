@@ -25,7 +25,7 @@ public:
     mpi getPrivateKey();
     MyPoint *getBasePoint();
 
-    MyPoint *encryptPoint(MyPoint *p_new, int k);
+   // MyPoint *encryptPoint(MyPoint *p_new, int k);
     MyPoint *encryptPointFast(MyPoint *p_new, mpi counter);
     MyPoint *decryptPoint(MyPoint *p);
     MyPoint *addDouble(MyPoint *point);
@@ -37,9 +37,11 @@ public:
     QList<MyPoint *> *textToPoints(QString text);
     int charToCode(QChar ch);
     mpi NegModMPI(mpi *a, mpi *p);
+    static mpi stringToMPI(QString text);
     QString mpiToString(mpi number);
     static int generateRNG(void *, unsigned char * buffer, size_t numBytes);
-    MyCM *generateCm(int k, MyPoint *point, MyPoint *peer_public_key);
+    MyCM *generateCm(mpi counter, MyPoint *point, MyPoint *peer_public_key);
+    mpi generatePrivateKey();
 
 
 private:
@@ -50,6 +52,7 @@ private:
     int koblitz;
     MyPoint *base_point;
     MyPoint *result_point;
+    mpi r;
 };
 
 #endif // ECC_BIG_H

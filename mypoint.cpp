@@ -51,3 +51,26 @@ mpi MyPoint::stringToMPI(QString text)
 
     return number;
 }
+
+QString MyPoint::mpiToString(mpi number)
+{
+    int k = 512;
+    char buff[k];
+    size_t nlen = k;
+    QString text = "";
+
+    mpi_write_string( &number, 10, buff, &nlen);
+
+    for( int i = 0; i < k; i++ ){
+        if (buff[i] == '0' || buff[i] == '1' || buff[i] == '2' || buff[i] == '3' || buff[i] == '4' || buff[i] == '5'
+                || buff[i] == '6' || buff[i] == '7' || buff[i] == '8' || buff[i] == '9')  text += buff[i];
+        else return text;
+    }
+
+    return text;
+}
+
+QString MyPoint::toString()
+{
+    return "("+mpiToString(x)+", "+mpiToString(y)+")";
+}

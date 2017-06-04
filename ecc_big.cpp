@@ -4,6 +4,9 @@ ECC_BIG::ECC_BIG()
 {
     QTime time = QTime::currentTime();
     qsrand((uint)time.msec());
+
+    mpi_init(&r);
+    r = stringToMPI("26959946667150639794667015087019625940457807714424391721682722368061");
 }
 
 void ECC_BIG::setA(int a)
@@ -56,7 +59,7 @@ MyPoint *ECC_BIG::getBasePoint()
     return base_point;
 }
 
-MyPoint *ECC_BIG::encryptPoint(MyPoint *p_new, int k)
+/*MyPoint *ECC_BIG::encryptPoint(MyPoint *p_new, int k)
 {
 
     MyPoint *p ;
@@ -72,7 +75,7 @@ MyPoint *ECC_BIG::encryptPoint(MyPoint *p_new, int k)
     }
 
     return p;
-}
+}*/
 
 MyPoint *ECC_BIG::encryptPointFast(MyPoint *p_new, mpi counter)
 {
@@ -379,6 +382,23 @@ return (n * p) - b;
     return n;
 }
 
+mpi ECC_BIG::stringToMPI(QString text)
+{
+    mpi number; mpi_init(&number);
+    int k = 224;
+    char buff[k];
+
+    for (int i = 0; i < k; i++){
+        buff[i] = '\n';
+    }
+
+    for (int i = 0; i < text.size(); i++){
+        buff[i] = text.at(i).toLatin1();
+    }
+    mpi_read_string( &number, 10, buff);
+    return number;
+}
+
 QString ECC_BIG::mpiToString(mpi number)
 {
     int k = 2048;
@@ -404,11 +424,25 @@ int ECC_BIG::generateRNG(void *, unsigned char *buffer, size_t numBytes)
     return 0;
 }
 
-MyCM *ECC_BIG::generateCm(int k, MyPoint *point, MyPoint *peer_public_key)
+MyCM *ECC_BIG::generateCm(mpi counter, MyPoint *point, MyPoint *peer_public_key)
 {
-    MyPoint *p1 = encryptPoint(base_point, k);
-    MyPoint *p2 = encryptPoint(peer_public_key, k);
+    MyPoint *p1 = encryptPointFast(base_point, counter);
+    MyPoint *p2 = encryptPointFast(peer_public_key, counter);
     p2 = addPoints(point, p2);
 
     return new MyCM(p1, p2);
+}
+
+mpi ECC_BIG::generatePrivateKey()
+{
+    // r is the max value
+    mpi key; mpi_init(&key);
+    //int counter = 0;
+    do{
+        //counter++;
+        mpi_fill_random(&key, 28, generateRNG, NULL);
+    } while(mpi_cmp_mpi(&key, &r) == 1);
+
+    //qDebug() << "counter " << counter;
+    return key;
 }

@@ -25,10 +25,14 @@ public:
     mpi generatePrimeMPI();
     static mpi stringToMPI(QString text);
     QString mpiToString(mpi number);
+    void generatePrivateKeys();
+    void generatePublicKeys();
+
 
 private:
     Ui::BigWindow *ui;
-    QString private_key_a, private_key_b;
+    mpi private_key_a, private_key_b;
+    MyPoint *public_key_a, *public_key_b;
     ECC_BIG *ecc_big;
 };
 

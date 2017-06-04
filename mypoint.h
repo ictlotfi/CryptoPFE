@@ -16,6 +16,8 @@ public:
     mpi X();
     mpi Y();
     static mpi stringToMPI(QString text);
+    QString mpiToString(mpi number);
+    QString toString();
 
 private:
     mpi x, y;
