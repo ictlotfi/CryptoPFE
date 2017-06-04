@@ -78,19 +78,24 @@ MyPoint *ECC_BIG::encryptPointFast(MyPoint *p_new, int k)
 {
     MyPoint *q = p_new;
     MyPoint *r = new MyPoint();
+    int nb_double = 0;
+    int nb_add = 0;
 
-    //if (k == 1) return p_new;
     while (k > 0) {
         if (k % 2 == 1){
-            qDebug() << "addPoints" << k;
             r = addPoints(r, q);
+            nb_add++;
         }
-        qDebug() << "addDouble" << k;
-        q = addDouble(q);
-        qDebug() << mpiToString(q->X());
-        qDebug() << mpiToString(q->Y());
+
         k = k/2;
+        if (k != 0){
+            nb_double++;
+            q = addDouble(q);
+        }
     }
+
+    qDebug() << "nb_add " << nb_add;
+    qDebug() << "nb_double " << nb_double;
     return r;
 }
 
