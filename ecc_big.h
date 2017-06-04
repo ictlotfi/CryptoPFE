@@ -42,6 +42,7 @@ public:
     static int generateRNG(void *, unsigned char * buffer, size_t numBytes);
     MyCM *generateCm(mpi counter, MyPoint *point, MyPoint *peer_public_key);
     mpi generatePrivateKey();
+    bool isOnCurve(mpi x, mpi y);
 
 
 private:

@@ -29,6 +29,9 @@ public:
     void generatePublicKeys();
 
 
+private slots:
+    void on_button_encode_message_clicked();
+
 private:
     Ui::BigWindow *ui;
     mpi private_key_a, private_key_b;

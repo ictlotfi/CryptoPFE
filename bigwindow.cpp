@@ -236,8 +236,8 @@ void BigWindow::generatePrivateKeys()
     private_key_a = ecc_big->generatePrivateKey();
     private_key_b = ecc_big->generatePrivateKey();
 
-    qDebug() << "private_key_a " << mpiToString(private_key_a);
-    qDebug() << "private_key_b " << mpiToString(private_key_b);
+   // qDebug() << "private_key_a " << mpiToString(private_key_a);
+   // qDebug() << "private_key_b " << mpiToString(private_key_b);
 
     ui->textEdit_private_key_alice->setText(mpiToString(private_key_a));
     ui->textEdit_private_key_bob->setText(mpiToString(private_key_b));
@@ -250,4 +250,23 @@ void BigWindow::generatePublicKeys()
 
     ui->textEdit_public_key_alice->setText(public_key_a->toString());
     ui->textEdit_public_key_bob->setText(public_key_b->toString());
+}
+
+void BigWindow::on_button_encode_message_clicked()
+{
+    ui->textEdit_encoded_message->clear();
+    ui->textEdit_encrypted_message->clear();
+    ui->textEdit_cm_message->clear();
+    ui->textEdit_decrypted_message->clear();
+
+    QString message = ui->lineEdit_message->text();
+
+    QList<MyPoint*> *list = ecc_big->textToPoints(message.toLower());
+
+    for (int i = 0; i < list->size(); i++){
+        MyPoint *p = list->at(i);
+        QString encodedPoint = p->toString();
+        ui->textEdit_encoded_message->append(encodedPoint);
+        break;
+    }
 }

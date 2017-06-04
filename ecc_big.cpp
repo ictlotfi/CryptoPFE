@@ -7,6 +7,7 @@ ECC_BIG::ECC_BIG()
 
     mpi_init(&r);
     r = stringToMPI("26959946667150639794667015087019625940457807714424391721682722368061");
+    koblitz = 3000;
 }
 
 void ECC_BIG::setA(int a)
@@ -107,8 +108,8 @@ MyPoint *ECC_BIG::encryptPointFast(MyPoint *p_new, mpi counter)
         }
     }
 
-    qDebug() << "nb_add " << nb_add;
-    qDebug() << "nb_double " << nb_double;
+  //  qDebug() << "nb_add " << nb_add;
+   // qDebug() << "nb_double " << nb_double;
     return r;
 }
 
@@ -295,17 +296,25 @@ MyPoint *ECC_BIG::multPoint(MyPoint *p, int k)
 
 MyPoint *ECC_BIG::generatePoint(int m)
 {
-    return NULL;
+    return encryptPointFast(base_point, stringToMPI(QString::number(m)));
 }
 
 QList<MyPoint *> *ECC_BIG::textToPoints(QString text)
 {
-    return NULL;
+    QList<MyPoint*> *list = new QList<MyPoint*>();
+
+    for (int i = 0; i < text.size(); i++){
+        QChar ch = text[i];
+        int m = charToCode(ch);
+        MyPoint *point = generatePoint(m);
+        list->append(point);
+    }
+    return list;
 }
 
 int ECC_BIG::charToCode(QChar ch)
 {
-    if (ch == '0') return 0;
+    if (ch == '0') return 36;
     else if (ch == '1') return 1;
     else if (ch == '2') return 2;
     else if (ch == '3') return 3;
@@ -409,8 +418,10 @@ QString ECC_BIG::mpiToString(mpi number)
     int val = mpi_write_string( &number, 10, buff, &nlen);
 
     //qDebug() << "val " << val;
-    for( int i = 0; i < 256; i++ ){
-        text += buff[i];
+    for( int i = 0; i < k; i++ ){
+        if (buff[i] == '0' || buff[i] == '1' || buff[i] == '2' || buff[i] == '3' || buff[i] == '4' || buff[i] == '5'
+                || buff[i] == '6' || buff[i] == '7' || buff[i] == '8' || buff[i] == '9')  text += buff[i];
+        else return text;
     }
 
     return text;
@@ -445,4 +456,31 @@ mpi ECC_BIG::generatePrivateKey()
 
     //qDebug() << "counter " << counter;
     return key;
+}
+
+bool ECC_BIG::isOnCurve(mpi x, mpi y)
+{
+    mpi t0, t1, t3;
+    mpi_init(&t0);mpi_init(&t1);mpi_init(&t3);
+
+
+    //y^2 = x^3 -3X + B
+    mpi_mul_mpi(&t3, &y, &y);
+    mpi_mod_mpi(&t3, &t3, &p);
+
+    mpi_mul_mpi(&t0, &x, &x);
+    mpi_mul_mpi(&t0, &t0, &x);
+
+    mpi_mul_negative(&t1, &x, a);
+
+    mpi_add_mpi(&t0, &t0, &b);
+    mpi_add_mpi(&t0, &t0, &t1);
+
+    mpi_mod_mpi(&t0, &t0, &p);
+
+    // compare t0 and t3
+    qDebug() << "t0 " << mpiToString(t0);
+    qDebug() << "t3 " << mpiToString(t3);
+    if (mpi_cmp_mpi(&t0, &t3) == 0) return true;
+    else return false;
 }
