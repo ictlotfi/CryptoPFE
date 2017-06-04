@@ -74,23 +74,33 @@ MyPoint *ECC_BIG::encryptPoint(MyPoint *p_new, int k)
     return p;
 }
 
-MyPoint *ECC_BIG::encryptPointFast(MyPoint *p_new, int k)
+MyPoint *ECC_BIG::encryptPointFast(MyPoint *p_new, mpi counter)
 {
-    MyPoint *q = p_new;
+    MyPoint *q = new MyPoint(p_new->X(), p_new->Y());
+
     MyPoint *r = new MyPoint();
     int nb_double = 0;
     int nb_add = 0;
+    t_uint temp_mod = 5;
+    t_uint temp_1 = 1;
+    mpi k; mpi_init(&k);
+    mpi_copy(&k, &counter);
+    //mpi temp_mod; mpi_init(&temp_mod);
 
-    while (k > 0) {
-        if (k % 2 == 1){
+    while (mpi_cmp_int(&k, 0) == 1) {
+        mpi_mod_int(&temp_mod, &k, 2);
+
+        if (temp_mod == temp_1){
             r = addPoints(r, q);
             nb_add++;
         }
 
-        k = k/2;
-        if (k != 0){
+        mpi_div_int(&k, NULL, &k, 2);
+
+        if (mpi_cmp_int(&k, 0) == 1){
             nb_double++;
             q = addDouble(q);
+
         }
     }
 

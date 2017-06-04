@@ -26,7 +26,7 @@ public:
     MyPoint *getBasePoint();
 
     MyPoint *encryptPoint(MyPoint *p_new, int k);
-    MyPoint *encryptPointFast(MyPoint *p_new, int k);
+    MyPoint *encryptPointFast(MyPoint *p_new, mpi counter);
     MyPoint *decryptPoint(MyPoint *p);
     MyPoint *addDouble(MyPoint *point);
     MyPoint *addPoints(MyPoint *point1, MyPoint *point2);

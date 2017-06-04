@@ -8,13 +8,12 @@ BigWindow::BigWindow(QWidget *parent) :
     ui(new Ui::BigWindow)
 {
     ui->setupUi(this);
+    this->showMaximized();
 
     QTime time = QTime::currentTime();
     qsrand((uint)time.msec());
     ecc_big = new ECC_BIG();
-    ecc_big->setA(ui->lineEdit_a->text().toInt());
-    ecc_big->setB(stringToMPI(ui->lineEdit_b->text()));
-    ecc_big->setP(stringToMPI(ui->lineEdit_p->text()));
+    generate_equation();
 
     private_key_a = "20723429452102997097693055120908112174847588083791179561894667245437";
     private_key_b = "26783546327533480407843357618229179705380334259814175764895254907511";
@@ -52,8 +51,14 @@ BigWindow::BigWindow(QWidget *parent) :
 
     MyPoint *myPoint0 = new MyPoint();
     MyPoint *myPoint1 = new MyPoint();
+    myPoint0->setX(base_x);
+    myPoint0->setY(base_y);
     //ecc_big->setBasePoint(myPoint);
-    myPoint1 = ecc_big->encryptPointFast(myPoint, 200);
+
+    mpi k; mpi_init(&k);
+    k = stringToMPI("26783546327533480407843357618229179705380334259814175764895254907511");
+    myPoint1 = ecc_big->encryptPointFast(myPoint, k);
+
 
    // myPoint0 = ecc_big->addPoints(myPoint1, myPoint);
   //  myPoint0 = ecc_big->addPoints(myPoint0, myPoint);
@@ -67,7 +72,7 @@ BigWindow::BigWindow(QWidget *parent) :
     qDebug() << "myPoint1.X " << mpiToString(myPoint1->X());
     qDebug() << "myPoint1.Y " << mpiToString(myPoint1->Y());
 
-    /*qDebug() << "myPoint0.X " << mpiToString(myPoint0->X());
+   /* qDebug() << "myPoint0.X " << mpiToString(myPoint0->X());
     qDebug() << "myPoint0.Y " << mpiToString(myPoint0->Y());*/
 
    /* ECC *ecc_stand = new ECC();
@@ -119,6 +124,25 @@ BigWindow::BigWindow(QWidget *parent) :
 BigWindow::~BigWindow()
 {
     delete ui;
+}
+
+void BigWindow::generate_equation()
+{
+    int a = ui->lineEdit_a->text().toInt();
+    QString equation = "Y^2 = X^3 ";
+    if( a>0)  equation += " +" +ui->lineEdit_a->text() +"X ";
+    else equation += " " +ui->lineEdit_a->text() +"X ";
+
+    equation += " +" +ui->lineEdit_b->text();
+
+    equation += "\n       Z/"+ui->lineEdit_p->text()+"Z";
+
+    ui->label_ec_equation->setText(equation);
+
+
+    ecc_big->setA(ui->lineEdit_a->text().toInt());
+    ecc_big->setB(stringToMPI(ui->lineEdit_b->text()));
+    ecc_big->setP(stringToMPI(ui->lineEdit_p->text()));
 }
 
 int BigWindow::generateRNG(void *, unsigned char *buffer, size_t numBytes)

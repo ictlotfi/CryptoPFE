@@ -19,6 +19,7 @@ class BigWindow : public QMainWindow
 public:
     explicit BigWindow(QWidget *parent = 0);
     ~BigWindow();
+    void generate_equation();
     static int generateRNG(void *, unsigned char * buffer, size_t numBytes);
     QString generatePrime();
     mpi generatePrimeMPI();
