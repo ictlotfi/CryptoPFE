@@ -22,7 +22,7 @@ public:
     static int generateRNG(void *, unsigned char * buffer, size_t numBytes);
     QString generatePrime();
     mpi generatePrimeMPI();
-    mpi stringToMPI(QString text);
+    static mpi stringToMPI(QString text);
     QString mpiToString(mpi number);
 
 private:

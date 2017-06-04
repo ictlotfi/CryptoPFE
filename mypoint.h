@@ -15,7 +15,7 @@ public:
 
     mpi X();
     mpi Y();
-    mpi stringToMPI(QString text);
+    static mpi stringToMPI(QString text);
 
 private:
     mpi x, y;

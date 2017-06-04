@@ -111,6 +111,8 @@ QPoint *ECC::addDouble(QPoint *point) // int xp, int yp, int &xr, int &yr, int a
         n *= -1;
         d *= -1;
     }
+
+   // qDebug() << "d " << d;
     int x = InvMod(d, p);
     if (n * x > 0) {
         s = (n * x) % p;

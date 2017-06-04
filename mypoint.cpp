@@ -40,6 +40,10 @@ mpi MyPoint::stringToMPI(QString text)
     int k = 224;
     char buff[k];
 
+    for (int i = 0; i < k; i++){
+        buff[i] = '\n';
+    }
+
     for (int i = 0; i < text.size(); i++){
         buff[i] = text.at(i).toLatin1();
     }

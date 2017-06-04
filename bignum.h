@@ -518,6 +518,16 @@ int mpi_mul_mpi( mpi *X, const mpi *A, const mpi *B );
  */
 int mpi_mul_int( mpi *X, const mpi *A, t_sint b );
 
+
+/**
+ * @brief mpi_mul_negative
+ * @param X
+ * @param A
+ * @param b
+ * @return
+ */
+int mpi_mul_negative( mpi *X, const mpi *A, int b);
+
 /**
  * \brief          Division by mpi: A = Q * B + R
  *

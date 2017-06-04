@@ -123,14 +123,16 @@ MyPoint *ECC_BIG::addDouble(MyPoint *point)
 
     mpi_mul_mpi(&n, &p_x, &p_x);
     mpi_mul_int(&n, &n, 3);
-    mpi_add_int(&n, &n, a);
 
+    mpi_add_int(&n, &n, a);
     mpi_mul_int(&d, &p_y, 2);
 
     if (mpi_cmp_int(&d, 0) == -1){
-        mpi_mul_int(&n, &n, -1);
-        mpi_mul_int(&d, &d, -1);
+        mpi_mul_negative(&n, &n, -1);
+        mpi_mul_negative(&d, &d, -1);
     }
+
+    //qDebug() << "mpi_n " << mpiToString(n);
 
     mpi x, temp0;
     mpi_init(&x);
@@ -216,8 +218,8 @@ MyPoint *ECC_BIG::addPoints(MyPoint *point1, MyPoint *point2)
     mpi_sub_mpi(&d, &p1_x, &p2_x);
 
     if (mpi_cmp_int(&d, 0) == -1){
-        mpi_mul_int(&n, &n, -1);
-        mpi_mul_int(&d, &d, -1);
+        mpi_mul_negative(&n, &n, -1);
+        mpi_mul_negative(&d, &d, -1);
     }
 
     mpi x, temp0;
@@ -336,7 +338,7 @@ return (n * p) - b;
     mpi_init(&q);
     mpi_init(&r);
 
-    mpi_mul_int(&b, a, -1);
+    mpi_mul_negative(&b, a, -1);
     /* Division by mpi: A = Q * B + R
      \param Q        Destination MPI for the quotient
      * \param R        Destination MPI for the rest value

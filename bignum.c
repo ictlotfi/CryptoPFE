@@ -1070,6 +1070,21 @@ int mpi_mul_int( mpi *X, const mpi *A, t_sint b )
     return( mpi_mul_mpi( X, A, &_B ) );
 }
 
+int mpi_mul_negative( mpi *X, const mpi *A, int b){
+    if (b>0){
+        return mpi_mul_int( X, A, b );
+    }
+    mpi _T0, _T1;
+    mpi_init(&_T0);
+    mpi_init(&_T1);
+
+    mpi_mul_int( &_T0, A, -b );
+    mpi_mul_int( &_T1, &_T0, 2);
+    return mpi_sub_mpi(X, &_T0, &_T1);
+}
+
+
+
 /*
  * Division by mpi: A = Q * B + R  (HAC 14.20)
  */

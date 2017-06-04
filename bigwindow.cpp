@@ -1,5 +1,7 @@
 #include "bigwindow.h"
 #include "ui_bigwindow.h"
+#include "ecc.h"
+
 
 BigWindow::BigWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -20,8 +22,11 @@ BigWindow::BigWindow(QWidget *parent) :
     mpi numberB; mpi_init(&numberB);
     mpi numberP; mpi_init(&numberP);
 
-    numberB = stringToMPI("18958286285566608000408668544493926415504680968679321075787234672564");
-    numberP = stringToMPI("26959946667150639794667015087019630673557916260026308143510066298881");
+    numberB = stringToMPI("3");
+    numberP = stringToMPI("1063");
+    ecc_big->setB(stringToMPI("3"));
+    ecc_big->setP(stringToMPI("1063"));
+
 
     /*number = stringToMPI(private_key_a);
 
@@ -34,32 +39,50 @@ BigWindow::BigWindow(QWidget *parent) :
     mpi base_x, base_y;
     mpi_init(&base_x);mpi_init(&base_y);
 
-    base_x = stringToMPI(ui->lineEdit_base_x->text());
-    base_y = stringToMPI(ui->lineEdit_base_y->text());
+  //  base_x = stringToMPI(ui->lineEdit_base_x->text());
+  //  base_y = stringToMPI(ui->lineEdit_base_y->text());
 
-   // base_x = stringToMPI("15");
-   // base_y = stringToMPI("1051");
+    base_x = stringToMPI("15");
+    base_y = stringToMPI("1051");
 
     // 6455442420784385171892731890321939130302256445452508665571987526
     // 11713622093973467124672938316960118024378453519425273321965577354050
     myPoint->setX(base_x);
     myPoint->setY(base_y);
-/*
+
     MyPoint *myPoint0 = new MyPoint();
     MyPoint *myPoint1 = new MyPoint();
     //ecc_big->setBasePoint(myPoint);
-    myPoint0 = ecc_big->addDouble(myPoint);
+    myPoint1 = ecc_big->addDouble(myPoint);
 
-    myPoint1 = ecc_big->addPoints(myPoint0, myPoint);
-    myPoint1 = ecc_big->addPoints(myPoint1, myPoint);
+    myPoint0 = ecc_big->addPoints(myPoint1, myPoint);
+    myPoint0 = ecc_big->addPoints(myPoint0, myPoint);
 
-    myPoint0 = ecc_big->addDouble(myPoint0);
-*/
+  //  myPoint0 = ecc_big->addDouble(myPoint1);
 
-   /* qDebug() << "zzzz " << mpiToString(myPoint0->X());
-    qDebug() << "zzzz " << mpiToString(myPoint0->Y());
-    qDebug() << "zzzz " << mpiToString(myPoint1->X());
-    qDebug() << "zzzz " << mpiToString(myPoint1->Y());*/
+
+
+
+
+  /*  qDebug() << "myPoint1.X " << mpiToString(myPoint1->X());
+    qDebug() << "myPoint1.Y " << mpiToString(myPoint1->Y());*/
+
+    qDebug() << "myPoint0.X " << mpiToString(myPoint0->X());
+    qDebug() << "myPoint0.Y " << mpiToString(myPoint0->Y());
+
+   /* ECC *ecc_stand = new ECC();
+    ecc_stand->setA(-3);
+    ecc_stand->setB(3);
+    ecc_stand->setP(1063);
+
+    QPoint *point = ecc_stand->addDouble(new QPoint(15, 1051));
+    qDebug() << "X " << point->x();
+    qDebug() << "Y " << point->y();*/
+
+
+    point = ecc_stand->addDouble(point);
+    qDebug() << "X " << point->x();
+    qDebug() << "Y " << point->y();
 
 
   /*  qDebug() << "numberB " << mpiToString(numberB);
@@ -67,8 +90,10 @@ BigWindow::BigWindow(QWidget *parent) :
     qDebug() << "base_x " << mpiToString(base_x);
     qDebug() << "base_y " << mpiToString(base_y);
 */
-    mpi t0, t1, t3;
+   /* mpi t0, t1, t3;
     mpi_init(&t0);mpi_init(&t1);mpi_init(&t3);
+
+
     //y^2 = x^3 -3X + B
     mpi_mul_mpi(&t3, &base_y, &base_y);
     mpi_mod_mpi(&t3, &t3, &numberP);
@@ -76,15 +101,19 @@ BigWindow::BigWindow(QWidget *parent) :
     mpi_mul_mpi(&t0, &base_x, &base_x);
     mpi_mul_mpi(&t0, &t0, &base_x);
 
-    mpi_mul_int(&t1, &base_x, 3);//t1<- 3*x
+    mpi_mul_negative(&t1, &base_x, -3);//t1<- 3*x
+    //qDebug() << "t1 " << mpiToString(t1);
 
     mpi_add_mpi(&t0, &t0, &numberB);
-    mpi_sub_mpi(&t0, &t0, &t1);
+    mpi_add_mpi(&t0, &t0, &t1);
 
     mpi_mod_mpi(&t0, &t0, &numberP);
 
-    qDebug() << "zzzz " << mpiToString(t0);
-    qDebug() << "zzzz " << mpiToString(t3);
+    qDebug() << "t0 " << mpiToString(t0);
+    qDebug() << "t3 " << mpiToString(t3);*/
+
+
+
 }
 
 BigWindow::~BigWindow()
@@ -132,11 +161,14 @@ mpi BigWindow::stringToMPI(QString text)
     int k = 224;
     char buff[k];
 
+    for (int i = 0; i < k; i++){
+        buff[i] = '\n';
+    }
+
     for (int i = 0; i < text.size(); i++){
         buff[i] = text.at(i).toLatin1();
     }
     mpi_read_string( &number, 10, buff);
-
     return number;
 }
 
