@@ -20,7 +20,8 @@ BigWindow::BigWindow(QWidget *parent) :
 
 
     QRegExp validatorAlphaNumeric("[A-Za-z0-9]*");
-    ui->lineEdit_message->setValidator(new QRegExpValidator(validatorAlphaNumeric, ui->lineEdit_message));
+    ui->lineEdit_message_alice->setValidator(new QRegExpValidator(validatorAlphaNumeric, ui->lineEdit_message_alice));
+    ui->lineEdit_message_bob->setValidator(new QRegExpValidator(validatorAlphaNumeric, ui->lineEdit_message_bob));
 
 
     mpi numberB; mpi_init(&numberB);
@@ -228,7 +229,7 @@ QString BigWindow::mpiToString(mpi number)
 
     for( int i = 0; i < k; i++ ){
         if (buff[i] == '0' || buff[i] == '1' || buff[i] == '2' || buff[i] == '3' || buff[i] == '4' || buff[i] == '5'
-                || buff[i] == '6' || buff[i] == '7' || buff[i] == '8' || buff[i] == '9')  text += buff[i];
+                || buff[i] == '6' || buff[i] == '7' || buff[i] == '8' || buff[i] == '9' || buff[i] == '-')  text += buff[i];
         else return text;
     }
 
@@ -271,7 +272,7 @@ QList<MyCM *> BigWindow::textToMyCMList(QString text)
     for (int i = 0; i < list.size(); i++){
         //qDebug() << list.at(i);
         MyCM *myCM = stringToMyCM(list.at(i));
-        qDebug() << myCM->toString();
+        //qDebug() << myCM->toString();
         myCMList.append(myCM);;
     }
     return myCMList;
@@ -288,7 +289,6 @@ MyCM *BigWindow::stringToMyCM(QString arg0)
     arg.replace("\n", "");
     arg.replace("#", "");
 
-    qDebug() << "arg: " << arg;
 
     if (arg.startsWith("{") && arg.endsWith("}")){
         arg.replace("{", "");
@@ -333,11 +333,12 @@ QString BigWindow::myCMListToString(QList<MyCM *> list)
     return temp;
 }
 
-void BigWindow::on_button_encode_message_clicked()
+void BigWindow::on_button_encode_message_alice_clicked()
 {
-    ui->textEdit_encrypted_message->clear();
+    ui->textEdit_encrypted_message_alice->clear();
+    ui->textEdit_encrypted_message_received_bob->clear();
 
-    QString message = ui->lineEdit_message->text();
+    QString message = ui->lineEdit_message_alice->text();
 
     QList<MyPoint*> *list = ecc_big->textToPoints(message.toLower());
     QString temp = "";
@@ -349,19 +350,105 @@ void BigWindow::on_button_encode_message_clicked()
         temp = cm->toString();
         if (i != list->size()-1) temp +="#";
 
-        ui->textEdit_encrypted_message->append(temp);
+
+        qDebug() << "origin: "<< p->toString();
+        ui->textEdit_encrypted_message_alice->append(temp);
+        ui->textEdit_encrypted_message_received_bob->append(temp);
     }
 }
 
-void BigWindow::on_lineEdit_message_textChanged(const QString &arg1)
+void BigWindow::button_decrypt_message_alice()
 {
-    ui->lineEdit_message->setText(arg1.toUpper());
+
 }
 
-void BigWindow::on_button_decrypt_message_clicked()
+void BigWindow::on_button_encode_message_bob_clicked()
 {
-    QString text = ui->textEdit_encrypted_message->toPlainText();
+    ui->textEdit_encrypted_message_bob->clear();
+    ui->textEdit_encrypted_message_received_alice->clear();
+
+    QString message = ui->lineEdit_message_bob->text();
+
+    QList<MyPoint*> *list = ecc_big->textToPoints(message.toLower());
+    QString temp = "";
+    for (int i = 0; i < list->size(); i++){
+        MyPoint *p = list->at(i);
+
+        // generate CM
+        MyCM *cm = ecc_big->generateCm(k_b, p, public_key_a);
+        temp = cm->toString();
+        if (i != list->size()-1) temp +="#";
+
+
+        qDebug() << "origin: "<< p->toString();
+        ui->textEdit_encrypted_message_bob->append(temp);
+        ui->textEdit_encrypted_message_received_alice->append(temp);
+    }
+}
+
+void BigWindow::on_button_decrypt_message_bob_clicked()
+{
+    QString text = ui->textEdit_encrypted_message_received_bob->toPlainText();
     QList<MyCM *> list = textToMyCMList(text);
-    ui->textEdit_encrypted_message_received->clear();
-    ui->textEdit_encrypted_message_received->append(myCMListToString(list));
+    QList<MyPoint*> *listDecrypted = new QList<MyPoint*>();
+    ui->lineEdit_message_received_bob->clear();
+
+    //decrypt
+    for (int i = 0; i <list.size(); i++){
+        MyPoint *p1 = list.at(i)->getP1();
+        MyPoint *p2 = list.at(i)->getP2();
+
+        MyPoint *pp1 = ecc_big->encryptPointFast(p1, private_key_b);
+
+
+        mpi temp_y; mpi_init(&temp_y);
+        temp_y = pp1->Y();
+        mpi_mul_negative(&temp_y, &temp_y, -1);
+
+        pp1->setY(temp_y);
+
+        MyPoint *pp2 = ecc_big->addPoints(p2, pp1);
+        listDecrypted->append(pp2);
+    }
+
+    // point to alphabet
+    ui->lineEdit_message_received_bob->setText(ecc_big->pointsToText(listDecrypted));
+}
+
+void BigWindow::on_lineEdit_message_bob_textChanged(const QString &arg1)
+{
+    ui->lineEdit_message_bob->setText(arg1.toUpper());
+}
+
+void BigWindow::on_button_decrypt_message_alice_clicked()
+{
+    QString text = ui->textEdit_encrypted_message_received_alice->toPlainText();
+    QList<MyCM *> list = textToMyCMList(text);
+    QList<MyPoint*> *listDecrypted = new QList<MyPoint*>();
+    ui->lineEdit_message_received_alice->clear();
+
+    //decrypt
+    for (int i = 0; i <list.size(); i++){
+        MyPoint *p1 = list.at(i)->getP1();
+        MyPoint *p2 = list.at(i)->getP2();
+
+        MyPoint *pp1 = ecc_big->encryptPointFast(p1, private_key_a);
+
+
+        mpi temp_y; mpi_init(&temp_y);
+        temp_y = pp1->Y();
+        mpi_mul_negative(&temp_y, &temp_y, -1);
+
+        pp1->setY(temp_y);
+
+        MyPoint *pp2 = ecc_big->addPoints(p2, pp1);
+        listDecrypted->append(pp2);
+    }
+    // point to alphabet
+    ui->lineEdit_message_received_alice->setText(ecc_big->pointsToText(listDecrypted));
+}
+
+void BigWindow::on_lineEdit_message_alice_textChanged(const QString &arg1)
+{
+    ui->lineEdit_message_alice->setText(arg1.toUpper());
 }

@@ -33,12 +33,21 @@ public:
     QString myCMListToString(QList<MyCM *> list);
 
 
+
 private slots:
-    void on_button_encode_message_clicked();
+    void button_decrypt_message_alice();
 
-    void on_lineEdit_message_textChanged(const QString &arg1);
+    void on_button_encode_message_bob_clicked();
 
-    void on_button_decrypt_message_clicked();
+    void on_button_encode_message_alice_clicked();
+
+    void on_button_decrypt_message_bob_clicked();
+
+    void on_lineEdit_message_bob_textChanged(const QString &arg1);
+
+    void on_button_decrypt_message_alice_clicked();
+
+    void on_lineEdit_message_alice_textChanged(const QString &arg1);
 
 private:
     Ui::BigWindow *ui;

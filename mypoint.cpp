@@ -74,3 +74,14 @@ QString MyPoint::toString()
 {
     return "("+mpiToString(x)+", "+mpiToString(y)+")";
 }
+
+bool MyPoint::equal(MyPoint *p2)
+{
+    mpi x2; mpi_init(&x2);
+    mpi y2; mpi_init(&y2);
+    x2 = p2->X();
+    y2 = p2->Y();
+
+    if ((mpi_cmp_mpi(&x, &x2) == 0)&& (mpi_cmp_mpi(&y, &y2) == 0)) return true;
+    else return false;
+}

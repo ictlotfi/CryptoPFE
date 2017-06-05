@@ -36,6 +36,7 @@ public:
     MyPoint *generatePoint(int m);
     QList<MyPoint *> *textToPoints(QString text);
     int charToCode(QChar ch);
+    QChar codeToChar(int code);
     mpi NegModMPI(mpi *a, mpi *p);
     static mpi stringToMPI(QString text);
     QString mpiToString(mpi number);
@@ -43,6 +44,8 @@ public:
     MyCM *generateCm(mpi counter, MyPoint *point, MyPoint *peer_public_key);
     mpi generatePrivateKey();
     bool isOnCurve(mpi x, mpi y);
+    QString pointsToText(QList<MyPoint*> *list);
+    QString pointToString(MyPoint *p);
 
 
 private:

@@ -13,6 +13,10 @@
   <property name="windowTitle">
    <string>Big Window</string>
   </property>
+  <property name="windowIcon">
+   <iconset>
+    <normaloff>logo.jpg</normaloff>logo.jpg</iconset>
+  </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout_5">
     <item>
@@ -247,7 +251,8 @@ QGroupBox::title {
     padding: 0px 5px 0px 5px;
 }
 QGroupBox {
-background-color: rgb(236, 96, 163);
+background-color: rgb(255,105,180)
+
 }
 </string>
           </property>
@@ -334,26 +339,26 @@ background-color: rgb(236, 96, 163);
                  </widget>
                 </item>
                 <item>
-                 <widget class="QLineEdit" name="lineEdit_message">
+                 <widget class="QLineEdit" name="lineEdit_message_alice">
                   <property name="text">
-                   <string>a</string>
+                   <string/>
                   </property>
                  </widget>
                 </item>
                 <item>
-                 <widget class="QPushButton" name="button_encode_message">
+                 <widget class="QPushButton" name="button_encode_message_alice">
                   <property name="cursor">
                    <cursorShape>PointingHandCursor</cursorShape>
                   </property>
                   <property name="text">
-                   <string>crypter</string>
+                   <string>Crypter</string>
                   </property>
                  </widget>
                 </item>
                </layout>
               </item>
               <item>
-               <widget class="QTextEdit" name="textEdit_encrypted_message"/>
+               <widget class="QTextEdit" name="textEdit_encrypted_message_alice"/>
               </item>
              </layout>
             </widget>
@@ -365,7 +370,7 @@ background-color: rgb(236, 96, 163);
              </property>
              <layout class="QVBoxLayout" name="verticalLayout_9">
               <item>
-               <widget class="QTextEdit" name="textEdit_encrypted_message_received"/>
+               <widget class="QTextEdit" name="textEdit_encrypted_message_received_alice"/>
               </item>
               <item>
                <layout class="QHBoxLayout" name="horizontalLayout_12">
@@ -377,14 +382,14 @@ background-color: rgb(236, 96, 163);
                  </widget>
                 </item>
                 <item>
-                 <widget class="QLineEdit" name="lineEdit_message_2">
+                 <widget class="QLineEdit" name="lineEdit_message_received_alice">
                   <property name="text">
                    <string/>
                   </property>
                  </widget>
                 </item>
                 <item>
-                 <widget class="QPushButton" name="button_decrypt_message">
+                 <widget class="QPushButton" name="button_decrypt_message_alice">
                   <property name="cursor">
                    <cursorShape>PointingHandCursor</cursorShape>
                   </property>
@@ -424,7 +429,7 @@ QGroupBox::title {
     padding: 0px 5px 0px 5px;
 }
 QGroupBox {
-background-color: rgb(114, 159, 207);
+	background-color: rgb(49, 171, 242);
 }
 </string>
           </property>
@@ -502,10 +507,10 @@ background-color: rgb(114, 159, 207);
                  </widget>
                 </item>
                 <item>
-                 <widget class="QLineEdit" name="lineEdit"/>
+                 <widget class="QLineEdit" name="lineEdit_message_bob"/>
                 </item>
                 <item>
-                 <widget class="QPushButton" name="pushButton">
+                 <widget class="QPushButton" name="button_encode_message_bob">
                   <property name="cursor">
                    <cursorShape>PointingHandCursor</cursorShape>
                   </property>
@@ -517,7 +522,7 @@ background-color: rgb(114, 159, 207);
                </layout>
               </item>
               <item>
-               <widget class="QTextEdit" name="textEdit"/>
+               <widget class="QTextEdit" name="textEdit_encrypted_message_bob"/>
               </item>
              </layout>
             </widget>
@@ -529,7 +534,7 @@ background-color: rgb(114, 159, 207);
              </property>
              <layout class="QVBoxLayout" name="verticalLayout_11">
               <item>
-               <widget class="QTextEdit" name="textEdit_2"/>
+               <widget class="QTextEdit" name="textEdit_encrypted_message_received_bob"/>
               </item>
               <item>
                <layout class="QHBoxLayout" name="horizontalLayout_14">
@@ -541,10 +546,10 @@ background-color: rgb(114, 159, 207);
                  </widget>
                 </item>
                 <item>
-                 <widget class="QLineEdit" name="lineEdit_2"/>
+                 <widget class="QLineEdit" name="lineEdit_message_received_bob"/>
                 </item>
                 <item>
-                 <widget class="QPushButton" name="pushButton_2">
+                 <widget class="QPushButton" name="button_decrypt_message_bob">
                   <property name="cursor">
                    <cursorShape>PointingHandCursor</cursorShape>
                   </property>

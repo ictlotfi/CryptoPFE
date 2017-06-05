@@ -18,6 +18,7 @@ public:
     static mpi stringToMPI(QString text);
     QString mpiToString(mpi number);
     QString toString();
+    bool equal(MyPoint *p2);
 
 private:
     mpi x, y;

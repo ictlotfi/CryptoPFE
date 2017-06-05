@@ -51,3 +51,8 @@ HEADERS  += mainwindow.h \
 
 FORMS    += mainwindow.ui \
     bigwindow.ui
+
+DISTFILES += \
+    icon.rc
+
+RC_FILE += icon.rc
