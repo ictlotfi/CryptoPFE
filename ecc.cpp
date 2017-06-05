@@ -300,6 +300,7 @@ QPoint *ECC::generatePoint(int m)
                 return new QPoint(x, y);
             }
         }
+
     }
     return new QPoint(0, 0);
 }

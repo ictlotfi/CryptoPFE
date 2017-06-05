@@ -4,9 +4,12 @@
 #
 #-------------------------------------------------
 
-QT       += core gui
+QT       += core gui printsupport
 
-greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
+greaterThan(QT_MAJOR_VERSION, 4){
+    QT += widgets printsupport
+    DEFINES += HAVE_QT5
+}
 
 TARGET = CryptoPFE
 TEMPLATE = app
@@ -33,7 +36,9 @@ SOURCES += main.cpp\
     ecc_big.cpp \
     mypoint.cpp \
     bigwindow.cpp \
-    mycm.cpp
+    mycm.cpp \
+    qcustomplot.cpp \
+    dialogplot.cpp
 
 HEADERS  += mainwindow.h \
     ecc.h \
@@ -47,10 +52,13 @@ HEADERS  += mainwindow.h \
     ecc_big.h \
     mypoint.h \
     bigwindow.h \
-    mycm.h
+    mycm.h \
+    qcustomplot.h \
+    dialogplot.h
 
 FORMS    += mainwindow.ui \
-    bigwindow.ui
+    bigwindow.ui \
+    dialogplot.ui
 
 DISTFILES += \
     icon.rc
