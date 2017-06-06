@@ -2,11 +2,15 @@
 #define BIGWINDOW_H
 
 #include <QMainWindow>
+#include <QMessageBox>
 #include "ecc_big.h"
 #include "bignum.h"
 #include "mypoint.h"
 #include <qglobal.h>
 #include <QTime>
+#include "dialogplot.h"
+#include "millerrabin.h"
+
 
 namespace Ui {
 class BigWindow;
@@ -31,6 +35,8 @@ public:
     QList<MyCM *> textToMyCMList(QString text);
     static MyCM *stringToMyCM(QString arg0);
     QString myCMListToString(QList<MyCM *> list);
+    bool isOnCurve(int x, int y, int a, int b, int p);
+    QPoint *generatePoint(int a, int b, int p);
 
 
 
@@ -48,6 +54,10 @@ private slots:
     void on_button_decrypt_message_alice_clicked();
 
     void on_lineEdit_message_alice_textChanged(const QString &arg1);
+
+    void on_actionPlot_triggered();
+
+    void on_button_generate_clicked();
 
 private:
     Ui::BigWindow *ui;

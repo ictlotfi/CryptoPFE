@@ -14,9 +14,15 @@ class DialogPlot : public QDialog
 public:
     explicit DialogPlot(QWidget *parent = 0);
     ~DialogPlot();
+    void setA(int a);
+    void setB(int b);
+    void setP(int p);
+    void setR(int r);
+    bool drawCurve();
 
 private:
     Ui::DialogPlot *ui;
+    int a, b, p, r;
 };
 
 #endif // DIALOGPLOT_H

@@ -24,7 +24,7 @@
       <property name="maximumSize">
        <size>
         <width>16777215</width>
-        <height>200</height>
+        <height>250</height>
        </size>
       </property>
       <property name="styleSheet">
@@ -121,6 +121,24 @@ QGroupBox::title {
               </item>
              </layout>
             </item>
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_17">
+              <item>
+               <widget class="QLabel" name="label_16">
+                <property name="text">
+                 <string>R :</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLineEdit" name="lineEdit_r">
+                <property name="text">
+                 <string>26959946667150639794667015087019625940457807714424391721682722368061</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
            </layout>
           </widget>
          </item>
@@ -204,6 +222,29 @@ QGroupBox::title {
           </widget>
          </item>
         </layout>
+       </item>
+       <item>
+        <widget class="QPushButton" name="button_generate">
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>50</height>
+          </size>
+         </property>
+         <property name="font">
+          <font>
+           <pointsize>16</pointsize>
+           <weight>75</weight>
+           <bold>true</bold>
+          </font>
+         </property>
+         <property name="cursor">
+          <cursorShape>PointingHandCursor</cursorShape>
+         </property>
+         <property name="text">
+          <string>Générer</string>
+         </property>
+        </widget>
        </item>
        <item>
         <widget class="QLabel" name="label_ec_equation">
@@ -581,8 +622,20 @@ QGroupBox {
      <height>22</height>
     </rect>
    </property>
+   <widget class="QMenu" name="menuAfficher">
+    <property name="title">
+     <string>Afficher</string>
+    </property>
+    <addaction name="actionPlot"/>
+   </widget>
+   <addaction name="menuAfficher"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
+  <action name="actionPlot">
+   <property name="text">
+    <string>Plot</string>
+   </property>
+  </action>
  </widget>
  <resources/>
  <connections/>

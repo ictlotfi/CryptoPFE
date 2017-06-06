@@ -367,6 +367,27 @@ CM *ECC::generateCm(int k, QPoint *point, QPoint *peer_public_key)
     return new CM(p1, p2);
 }
 
+bool ECC::isOnCurve(int x, int y)
+{
+    int k = y * y;
+    int m = (x * x * x) + a * x + b;
+    if (k % p == m % p) {
+        return true;
+    }
+    return false;
+}
+
+int ECC::getPointOrder(QPoint *point)
+{
+    for (int i =2; i <= p; i++){
+        QPoint *p_new = encryptPoint(point, i);
+        int x = p_new->x();
+        int y = p_new->y();
+        if (!isOnCurve(x, y)) return i;
+    }
+    return p;
+}
+
 QPoint *ECC::addPoints (QPoint *point1, QPoint *point2) //int xp, int yp, int xq, int yq, int &xr, int &yr, int p
 {
     int s;

@@ -43,6 +43,8 @@ public:
     QList<QPoint *> *textToPoints(QString text);
     int charToCode(QChar ch);
     CM *generateCm(int k, QPoint *point, QPoint *peer_public_key);
+    bool isOnCurve(int x, int y);
+    int getPointOrder(QPoint *point);
 
 private:
     int a;

@@ -15,6 +15,7 @@ public:
     void setA(int a);
     void setB(mpi b);
     void setP(mpi p);
+    void setR(mpi r);
     void setPrivateKey(mpi private_key);
     void setBasePoint(MyPoint *p);
 
@@ -22,6 +23,7 @@ public:
     int getA();
     mpi getB();
     mpi getP();
+    mpi getR();
     mpi getPrivateKey();
     MyPoint *getBasePoint();
 
@@ -46,6 +48,7 @@ public:
     bool isOnCurve(mpi x, mpi y);
     QString pointsToText(QList<MyPoint*> *list);
     QString pointToString(MyPoint *p);
+
 
 
 private:

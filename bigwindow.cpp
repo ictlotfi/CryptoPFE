@@ -19,116 +19,9 @@ BigWindow::BigWindow(QWidget *parent) :
     generateRandomK();
 
 
-    QRegExp validatorAlphaNumeric("[A-Za-z0-9]*");
+    QRegExp validatorAlphaNumeric("[A-Za-z0-9 ]*");
     ui->lineEdit_message_alice->setValidator(new QRegExpValidator(validatorAlphaNumeric, ui->lineEdit_message_alice));
     ui->lineEdit_message_bob->setValidator(new QRegExpValidator(validatorAlphaNumeric, ui->lineEdit_message_bob));
-
-
-    mpi numberB; mpi_init(&numberB);
-    mpi numberP; mpi_init(&numberP);
-
-    numberB = stringToMPI("18958286285566608000408668544493926415504680968679321075787234672564");
-    numberP = stringToMPI("26959946667150639794667015087019630673557916260026308143510066298881");
-  //  ecc_big->setB(stringToMPI("3"));
-  // ecc_big->setP(stringToMPI("1063"));
-
-
-    /*number = stringToMPI(private_key_a);
-
-    text = mpiToString(number);
-
-    qDebug() << text;*/
-
-    // creating base point
-    MyPoint *myPoint = new MyPoint();
-    mpi base_x, base_y;
-    mpi_init(&base_x);mpi_init(&base_y);
-
-    base_x = stringToMPI(ui->lineEdit_base_x->text());
-    base_y = stringToMPI(ui->lineEdit_base_y->text());
-
-   // base_x = stringToMPI("11838696407187388799350957250141035264678915751356546206913969278886");
-  //  base_y = stringToMPI("2966624012289393637077209076615926844583158638456025172915528198331");
-
-    // 6455442420784385171892731890321939130302256445452508665571987526
-    // 11713622093973467124672938316960118024378453519425273321965577354050
-    myPoint->setX(base_x);
-    myPoint->setY(base_y);
-
-    MyPoint *myPoint0 = new MyPoint();
-    MyPoint *myPoint1 = new MyPoint();
-    myPoint0->setX(base_x);
-    myPoint0->setY(base_y);
-    //ecc_big->setBasePoint(myPoint);
-
-    mpi k; mpi_init(&k);
-    k = ecc_big->generatePrivateKey();
-    myPoint1 = ecc_big->encryptPointFast(myPoint, k);
-
-
-   // myPoint0 = ecc_big->addPoints(myPoint1, myPoint);
-  //  myPoint0 = ecc_big->addPoints(myPoint0, myPoint);
-
-  //  myPoint0 = ecc_big->addDouble(myPoint1);
-
-
-
-
-   /* qDebug() << "k " << mpiToString(k);
-
-
-    qDebug() << "myPoint1.X " << mpiToString(myPoint1->X());
-    qDebug() << "myPoint1.Y " << mpiToString(myPoint1->Y());*/
-
-   /* qDebug() << "myPoint0.X " << mpiToString(myPoint0->X());
-    qDebug() << "myPoint0.Y " << mpiToString(myPoint0->Y());*/
-
-   /* ECC *ecc_stand = new ECC();
-    ecc_stand->setA(-3);
-    ecc_stand->setB(3);
-    ecc_stand->setP(1063);
-
-    QPoint *point = ecc_stand->addDouble(new QPoint(15, 1051));
-    qDebug() << "X " << point->x();
-    qDebug() << "Y " << point->y();
-
-
-    point = ecc_stand->addDouble(point);
-    qDebug() << "X " << point->x();
-    qDebug() << "Y " << point->y();*/
-
-
-  /*  qDebug() << "numberB " << mpiToString(numberB);
-    qDebug() << "numberP " << mpiToString(numberP);
-    qDebug() << "base_x " << mpiToString(base_x);
-    qDebug() << "base_y " << mpiToString(base_y);
-*/
-
-  /*  base_x = myPoint1->X();
-    base_y = myPoint1->Y();
-    mpi t0, t1, t3;
-    mpi_init(&t0);mpi_init(&t1);mpi_init(&t3);
-
-
-    //y^2 = x^3 -3X + B
-    mpi_mul_mpi(&t3, &base_y, &base_y);
-    mpi_mod_mpi(&t3, &t3, &numberP);
-
-    mpi_mul_mpi(&t0, &base_x, &base_x);
-    mpi_mul_mpi(&t0, &t0, &base_x);
-
-    mpi_mul_negative(&t1, &base_x, -3);//t1<- 3*x
-    //qDebug() << "t1 " << mpiToString(t1);
-
-    mpi_add_mpi(&t0, &t0, &numberB);
-    mpi_add_mpi(&t0, &t0, &t1);
-
-    mpi_mod_mpi(&t0, &t0, &numberP);
-
-    qDebug() << "t0 " << mpiToString(t0);
-    qDebug() << "t3 " << mpiToString(t3);*/
-
-
 
 }
 
@@ -160,10 +53,10 @@ void BigWindow::generate_equation()
     myPoint->setY(base_y);
 
 
-
     ecc_big->setA(ui->lineEdit_a->text().toInt());
     ecc_big->setB(stringToMPI(ui->lineEdit_b->text()));
     ecc_big->setP(stringToMPI(ui->lineEdit_p->text()));
+    ecc_big->setR(stringToMPI(ui->lineEdit_r->text()));
     ecc_big->setBasePoint(myPoint);
 }
 
@@ -333,6 +226,29 @@ QString BigWindow::myCMListToString(QList<MyCM *> list)
     return temp;
 }
 
+bool BigWindow::isOnCurve(int x, int y, int a, int b, int p)
+{
+    int k = y * y;
+    int m = (x * x * x) + a * x + b;
+    if (k % p == m % p) {
+        return true;
+    }
+    return false;
+}
+
+QPoint *BigWindow::generatePoint(int a, int b, int p)
+{
+    for (int x = 0; x < p; x++) {
+        for (int y = 0; y < p; y++) {
+            int k = y * y;
+            int m = (x * x * x) + a * x + b;
+            if (k % p == m % p) {
+                return new QPoint(x, y);
+            }
+        }
+    }
+}
+
 void BigWindow::on_button_encode_message_alice_clicked()
 {
     ui->textEdit_encrypted_message_alice->clear();
@@ -351,7 +267,7 @@ void BigWindow::on_button_encode_message_alice_clicked()
         if (i != list->size()-1) temp +="#";
 
 
-        qDebug() << "origin: "<< p->toString();
+       // qDebug() << "origin: "<< p->toString();
         ui->textEdit_encrypted_message_alice->append(temp);
         ui->textEdit_encrypted_message_received_bob->append(temp);
     }
@@ -451,4 +367,75 @@ void BigWindow::on_button_decrypt_message_alice_clicked()
 void BigWindow::on_lineEdit_message_alice_textChanged(const QString &arg1)
 {
     ui->lineEdit_message_alice->setText(arg1.toUpper());
+}
+
+void BigWindow::on_actionPlot_triggered()
+{
+    DialogPlot d;
+    d.setA(ecc_big->getA());
+    d.setB(mpiToString(ecc_big->getB()).toInt());
+    d.setP(mpiToString(ecc_big->getP()).toInt());
+    d.setR(mpiToString(ecc_big->getR()).toInt());
+    if (d.drawCurve()) d.exec();
+    else {
+        QMessageBox msgBox;
+        msgBox.setText("La courbe n'est pas supporté");
+        msgBox.exec();
+    }
+}
+
+void BigWindow::on_button_generate_clicked()
+{
+    int temp_p = ui->lineEdit_p->text().toInt();
+    int temp_a = ui->lineEdit_a->text().toInt();
+    int temp_b = ui->lineEdit_b->text().toInt();
+    MillerRabin *m = new MillerRabin();
+    if(!m->isPrime(temp_p) && temp_p>0){
+        QMessageBox msgBox;
+        msgBox.setText("P n'est pas premier");
+        msgBox.exec();
+
+        return;
+    }
+
+    if (temp_p > 0){ // p is not a big integer, so generate list of points
+        // get x and y and verify if they belong to the curve
+        int x = ui->lineEdit_base_x->text().toInt();
+        int y = ui->lineEdit_base_y->text().toInt();
+
+        if (x ==0 && y == 0){
+            QPoint *p = generatePoint(temp_a, temp_b, temp_p);
+            ui->lineEdit_base_x->setText(QString::number(p->x()));
+            ui->lineEdit_base_y->setText(QString::number(p->y()));
+
+            // getOrder
+            ECC *ecc = new ECC();
+            ecc->setA(temp_a);
+            ecc->setB(temp_b);
+            ecc->setP(temp_p);
+
+            int order = ecc->getPointOrder(p);
+            ui->lineEdit_r->setText(QString::number(order));
+
+        }
+        else if (!isOnCurve(x, y, temp_a, temp_b, temp_p)){
+            QMessageBox msgBox;
+            msgBox.setText("Le point de base n'est pas sur la courbe");
+            msgBox.exec();
+
+            return;
+        }
+    }
+
+    ecc_big = new ECC_BIG();
+    generate_equation();
+    generatePrivateKeys();
+    generatePublicKeys();
+    generateRandomK();
+    ui->lineEdit_message_alice->clear();
+    ui->lineEdit_message_bob->clear();
+    ui->textEdit_encrypted_message_alice->clear();
+    ui->textEdit_encrypted_message_bob->clear();
+    ui->textEdit_encrypted_message_received_alice->clear();
+    ui->textEdit_encrypted_message_received_bob->clear();
 }
