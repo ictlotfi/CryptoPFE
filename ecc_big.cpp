@@ -94,11 +94,10 @@ MyPoint *ECC_BIG::encryptPointFast(MyPoint *p_new, mpi counter)
     MyPoint *r = new MyPoint();
     int nb_double = 0;
     int nb_add = 0;
-    t_uint temp_mod = 5;
+    t_uint temp_mod = 0;
     t_uint temp_1 = 1;
     mpi k; mpi_init(&k);
     mpi_copy(&k, &counter);
-    //mpi temp_mod; mpi_init(&temp_mod);
 
     while (mpi_cmp_int(&k, 0) == 1) {
         mpi_mod_int(&temp_mod, &k, 2);
@@ -116,9 +115,6 @@ MyPoint *ECC_BIG::encryptPointFast(MyPoint *p_new, mpi counter)
 
         }
     }
-
-  //  qDebug() << "nb_add " << nb_add;
-   // qDebug() << "nb_double " << nb_double;
     return r;
 }
 
@@ -159,8 +155,6 @@ MyPoint *ECC_BIG::addDouble(MyPoint *point)
         mpi_mul_negative(&n, &n, -1);
         mpi_mul_negative(&d, &d, -1);
     }
-
-    //qDebug() << "mpi_n " << mpiToString(n);
 
     mpi x, temp0;
     mpi_init(&x);
@@ -296,11 +290,6 @@ MyPoint *ECC_BIG::addPoints(MyPoint *point1, MyPoint *point2)
     }
 
     return new MyPoint(temp_x_public, temp_y_public);
-}
-
-MyPoint *ECC_BIG::multPoint(MyPoint *p, int k)
-{
-    return NULL;
 }
 
 MyPoint *ECC_BIG::generatePoint(int m)
@@ -542,13 +531,11 @@ mpi ECC_BIG::generatePrivateKey()
     // r is the max value
     int r_size = mpi_size(&r);
     mpi key; mpi_init(&key);
-    //int counter = 0;
+
     do{
-        //counter++;
         mpi_fill_random(&key, r_size, generateRNG, NULL);
     } while(mpi_cmp_mpi(&key, &r) == 1);
 
-    //qDebug() << "counter " << counter;
     return key;
 }
 

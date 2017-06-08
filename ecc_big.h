@@ -27,14 +27,12 @@ public:
     mpi getPrivateKey();
     MyPoint *getBasePoint();
 
-   // MyPoint *encryptPoint(MyPoint *p_new, int k);
     MyPoint *encryptPointFast(MyPoint *p_new, mpi counter);
     MyPoint *decryptPoint(MyPoint *p);
     MyPoint *addDouble(MyPoint *point);
     MyPoint *addPoints(MyPoint *point1, MyPoint *point2);
 
 
-    MyPoint *multPoint(MyPoint *p, int k);
     MyPoint *generatePoint(int m);
     QList<MyPoint *> *textToPoints(QString text);
     int charToCode(QChar ch);
@@ -48,8 +46,6 @@ public:
     bool isOnCurve(mpi x, mpi y);
     QString pointsToText(QList<MyPoint*> *list);
     QString pointToString(MyPoint *p);
-
-
 
 private:
     int a;

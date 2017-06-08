@@ -2,6 +2,8 @@
 #define DIALOGPLOT_H
 
 #include <QDialog>
+#include <qglobal.h>
+#include <QTime>
 
 namespace Ui {
 class DialogPlot;
@@ -19,6 +21,7 @@ public:
     void setP(int p);
     void setR(int r);
     bool drawCurve();
+    bool drawCurveR();
 
 private:
     Ui::DialogPlot *ui;

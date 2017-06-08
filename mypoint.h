@@ -12,7 +12,6 @@ public:
     MyPoint(mpi x, mpi y);
     void setX(mpi x);
     void setY(mpi y);
-
     mpi X();
     mpi Y();
     static mpi stringToMPI(QString text);
