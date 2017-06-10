@@ -10,7 +10,7 @@
 #include <QTime>
 #include "dialogplot.h"
 #include "millerrabin.h"
-
+#include "qmath.h"
 
 namespace Ui {
 class BigWindow;
@@ -37,6 +37,8 @@ public:
     QString myCMListToString(QList<MyCM *> list);
     bool isOnCurve(int x, int y, int a, int b, int p);
     QPoint *generatePoint(int a, int b, int p);
+
+    qreal log2(qreal x);
 
 
 

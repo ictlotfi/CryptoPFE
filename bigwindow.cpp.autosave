@@ -26,18 +26,6 @@ BigWindow::BigWindow(QWidget *parent) :
     //	return Math.floor(Math.log2( Math.exp( Math.cbrt( (64/9) * naturalLog)
     // * Math.pow( Math.log( naturalLog ), 2/3) ) ))
 
-    int RSA_modulus = 32;
-
-    double t0 = std::pow(2, RSA_modulus);
-
-    int RSA_size = 32;
-    double t1 = std::cbrt((64/(double)9) * RSA_size);
-    double t2 = log2(qExp(t1 * std::pow(qLn(RSA_size), 2/3.)));
-
-    qDebug() << "t0 " << t0;
-    qDebug() << "t1 " << t1;
-    qDebug() << "t2 " << t2;
-
 }
 
 BigWindow::~BigWindow()
